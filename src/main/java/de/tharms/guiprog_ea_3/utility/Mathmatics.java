@@ -18,6 +18,7 @@ public class Mathmatics
      * @Vorbedingung Edges, Vertices und Faces dürfen keine identischen Objekte enthalten.
      * @Nachbedingung Gibt {@code true} zurück, wenn {@code V - E + F == 2}, andernfalls {@code false}.
      */
+    //TODO euler fixen
     public static boolean calculateEulerCharacteristics(
             int numberOfVertices, int numberOfEdges, int numberOfFaces)
     {

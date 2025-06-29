@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PolyhedronRenderer {
-
+    //TODO Renderer in Controller
     public static MeshView createMesh(Polyhedron polyhedron) {
         TriangleMesh mesh = new TriangleMesh();
 
@@ -55,7 +55,6 @@ public class PolyhedronRenderer {
         mesh.getFaces().addAll(faceIndexes);
 
         MeshView meshView = new MeshView(mesh);
-        meshView.setMaterial(new PhongMaterial(Color.GREEN));
 
         /*
         meshView.setTranslateX(0);

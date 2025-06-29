@@ -1,7 +1,6 @@
 package de.tharms.guiprog_ea_3.utility;
 
 import de.tharms.guiprog_ea_3.model.*;
-import de.tharms.guiprog_ea_3.view.Output;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Die Klasse {@code STLReader} bietet Funktionen zum Einlesen und Verarbeiten von STL-Dateien
@@ -65,25 +63,6 @@ public class STLReader
             e.printStackTrace();
             return null;
         }
-    }
-
-    /**
-     * Fordert den Benutzer auf, einen Dateinamen über die Konsole einzugeben.
-     *
-     * @return Der vollständige Dateipfad basierend auf der Benutzereingabe und dem voreingestellten Verzeichnis.
-     *
-     * @Vorbedingung Die Benutzereingabe liefert einen gültigen Dateinamen.
-     * @Nachbedingung Gibt den zusammengesetzten Dateipfad als String zurück.
-     */
-    public static String getFilenameFromUserInput()
-    {
-        Scanner userInput = new Scanner(System.in);
-
-        Output.filenameUserInput();
-
-        String filename = userInput.nextLine();
-
-        return Constants.DEFAULT_FILEPATH + filename;
     }
 
     /**

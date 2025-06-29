@@ -6,7 +6,6 @@ import javafx.application.Application;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -21,31 +20,38 @@ import javafx.stage.Stage;
 
 import java.io.File;
 
-public class ViewerController extends Application {
+public class ViewerController extends Application
+{
 
-    private final Group modelGroup = new Group();
-    private final Rotate modelRotateX = new Rotate(0, Rotate.X_AXIS);
-    private final Rotate modelRotateZ = new Rotate(0, Rotate.Z_AXIS);
-    private final Translate modelTranslate = new Translate();
-
-    private final Group sceneRoot = new Group();
+    private Group sceneRoot = new Group();
     private final Group axesGroup = new Group();
     private final Rotate cameraRotateX = new Rotate(0, Rotate.X_AXIS);
     private final Rotate cameraRotateY = new Rotate(0, Rotate.Y_AXIS);
-    private final Translate cameraDistance = new Translate(0, 0, -800);
 
     private MeshView meshView;
-    private double anchorX, anchorY;
-    private double anchorAngleX, anchorAngleZ;
+
+    private CheckBox showWireframe;
+    private CheckBox showAxis;
+
+    private CameraController cameraController;
+    private ModelController modelController;
 
     @Override
-    public void start(Stage primaryStage) {
-        // Menü + Sidebar + SubScene
-        MenuBar menuBar = createMenuBar();
-        SubScene subScene = create3DSubScene();
-        VBox rightSidebar = createSidebar();
+    public void start(Stage primaryStage)
+    {
+        Scene scene = buildMainScene();
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("STL Viewer");
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/stl_viewer_icon.png")));
+        primaryStage.show();
+    }
 
-        // Overlay-UI rechts oben (für Sidebar), im StackPane fixiert
+    private Scene buildMainScene()
+    {
+        MenuBar menuBar = createMenuBar();
+        VBox rightSidebar = createSidebar();
+        SubScene subScene = create3DSubScene();
+
         AnchorPane overlay = new AnchorPane(rightSidebar);
         AnchorPane.setTopAnchor(rightSidebar, 0.0);
         AnchorPane.setRightAnchor(rightSidebar, 0.0);
@@ -61,93 +67,19 @@ public class ViewerController extends Application {
         subScene.widthProperty().bind(centerStack.widthProperty());
         subScene.heightProperty().bind(centerStack.heightProperty());
 
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("STL Viewer");
-        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/stl_viewer_icon.png")));
-        primaryStage.show();
+        return scene;
     }
 
-
-
-    private SubScene create3DSubScene()
+    //TODO modularisieren
+    private MenuBar createMenuBar()
     {
-        meshView = PolyhedronRenderer.createMesh(
-                STLReader.createPolyhedronFromSTL(Constants.DEFAULT_FILEPATH + "cube_ascii.stl"));
-        modelGroup.getChildren().add(meshView);
-        modelGroup.getTransforms().addAll(modelRotateZ, modelRotateX, modelTranslate);
-
-        modelGroup.getChildren().clear();
-        modelGroup.getChildren().add(meshView);
-
-        axesGroup.getChildren().clear();
-        axesGroup.getChildren().add(createCoordinateAxes());
-
-        sceneRoot.getChildren().clear();
-        sceneRoot.getChildren().addAll(modelGroup, axesGroup, setupLighting());
-
-        sceneRoot.getTransforms().addAll(cameraRotateY, cameraRotateX);
-        sceneRoot.getTransforms().clear();
-        sceneRoot.getTransforms().addAll(cameraRotateY, cameraRotateX);
-
-        Group rootGroup = new Group(sceneRoot);
-        rootGroup.getTransforms().add(cameraDistance);
-
-        Translate cameraTranslate = new Translate(0, 0, -800);
-
-        PerspectiveCamera camera = new PerspectiveCamera(true);
-        camera.setNearClip(0.1);
-        camera.setFarClip(10000);
-        camera.getTransforms().add(cameraTranslate);
-
-        rootGroup.getChildren().add(camera);
-
-        SubScene subScene = getSubScene(rootGroup, camera, cameraTranslate);
-
-        return subScene;
-    }
-
-    private SubScene getSubScene(Group rootGroup, PerspectiveCamera camera, Translate cameraTranslate) {
-        SubScene subScene = new SubScene(rootGroup, 1000, 700, true, SceneAntialiasing.BALANCED);
-        subScene.setFill(Color.LIGHTGRAY);
-        subScene.setCamera(camera);
-
-        // Maussteuerung für SubScene
-        subScene.setOnMousePressed(e -> {
-            anchorX = e.getSceneX();
-            anchorY = e.getSceneY();
-            anchorAngleX = modelRotateX.getAngle();
-            anchorAngleZ = modelRotateZ.getAngle();
-        });
-
-        subScene.setOnMouseDragged(e -> {
-            double deltaX = e.getSceneX() - anchorX;
-            double deltaY = e.getSceneY() - anchorY;
-
-            if (e.getButton() == MouseButton.PRIMARY) {
-                if (e.isShiftDown()) {
-                    cameraRotateY.setAngle(cameraRotateY.getAngle() + deltaX * 0.01);
-                    cameraRotateX.setAngle(cameraRotateX.getAngle() - deltaY * 0.01);
-                } else {
-                    modelRotateZ.setAngle(anchorAngleZ + deltaX * 0.1);
-                    modelRotateX.setAngle(anchorAngleX - deltaY * 0.1);
-                }
-            } else if (e.getButton() == MouseButton.SECONDARY) {
-                modelTranslate.setX(modelTranslate.getX() + deltaX);
-                modelTranslate.setY(modelTranslate.getY() + deltaY);
-                anchorX = e.getSceneX();
-                anchorY = e.getSceneY();
-            }
-        });
-
-        subScene.setOnScroll(scroll -> {
-            double zoom = cameraTranslate.getZ() + scroll.getDeltaY() * 0.5;
-            cameraTranslate.setZ(Math.max(-10000, Math.min(-100, zoom)));
-        });
-        return subScene;
-    }
-
-    private MenuBar createMenuBar() {
         Menu datei = new Menu("Datei");
+
+        MenuItem loadSampleSTL = new MenuItem("Beispiel STL-Datei laden");
+        loadSampleSTL.setOnAction(e -> {
+            setMeshView(Constants.SAMPLE_STL_FILEPATH);
+            modelController.resetModel();
+        });
 
         MenuItem openFile = new MenuItem("STL-Datei öffnen...");
         openFile.setOnAction(e -> {
@@ -157,15 +89,14 @@ public class ViewerController extends Application {
             File selectedFile = fileChooser.showOpenDialog(null);
             if (selectedFile != null)
             {
-                PolyhedronRenderer.createMesh(STLReader.createPolyhedronFromSTL(selectedFile.getAbsolutePath()));
-                //ViewerController.setMesh(Mes)
+                setMeshView(selectedFile.getAbsolutePath());
             }
         });
 
         MenuItem beenden = new MenuItem("Beenden");
         beenden.setOnAction(e -> System.exit(0));
-        datei.getItems().add(beenden);
-        datei.getItems().add(openFile);
+
+        datei.getItems().addAll(loadSampleSTL, openFile, beenden);
 
         // Ansicht-Menü mit Rücksetzfunktionen
         Menu ansicht = new Menu("Ansicht");
@@ -173,17 +104,14 @@ public class ViewerController extends Application {
         MenuItem resetView = new MenuItem("Koordinatensystem zurücksetzen");
 
         resetModel.setOnAction(e -> {
-            modelTranslate.setX(0);
-            modelTranslate.setY(0);
-            modelTranslate.setZ(0);
-            modelRotateX.setAngle(0);
-            modelRotateZ.setAngle(0);
+            modelController.resetModel();
         });
 
         resetView.setOnAction(e -> {
-            cameraRotateX.setAngle(0);
-            cameraRotateY.setAngle(0);
-            cameraDistance.setZ(-400);
+            cameraController.resetView();
+            showAxis.setSelected(true);
+            showAxis.setVisible(true);
+            updateShowAxis();
         });
 
         ansicht.getItems().addAll(resetModel, resetView);
@@ -202,8 +130,48 @@ public class ViewerController extends Application {
         return new MenuBar(datei, ansicht, hilfe);
     }
 
+    private SubScene create3DSubScene()
+    {
+        sceneRoot = new Group();
+        sceneRoot.getTransforms().addAll(cameraRotateY, cameraRotateX);
 
-    private VBox createSidebar() {
+        modelController = new ModelController();
+        cameraController = new CameraController(sceneRoot, cameraRotateY, cameraRotateX);
+
+        //setMeshView(Constants.DEFAULT_FILEPATH + "cube_ascii.stl");
+
+        axesGroup.getChildren().add(createCoordinateAxes());
+
+        sceneRoot.getChildren().addAll(modelController.getModelGroup(), axesGroup, setupLighting());
+
+        SubScene subScene = new SubScene(cameraController.getRootGroup(), 1000, 700, true, SceneAntialiasing.BALANCED);
+        subScene.setFill(Color.LIGHTGRAY);
+        subScene.setCamera(cameraController.getCamera());
+
+        cameraController.attachMouseControl(subScene);
+        modelController.attachMouseControl(subScene);
+
+        return subScene;
+    }
+
+    private void setMeshView(String filepath)
+    {
+        meshView = PolyhedronRenderer.createMesh(
+                STLReader.createPolyhedronFromSTL(filepath));
+
+        if (meshView.getMaterial() == null)
+        {
+            //TODO methode für setdefaults
+            meshView.setMaterial(new PhongMaterial(Color.GREEN));
+        }
+
+        modelController.setMesh(meshView);
+        updateDrawMode();
+    }
+
+    //TODO modularisieren
+    private VBox createSidebar()
+    {
         Label title = new Label("Modell-Informationen");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
 
@@ -217,27 +185,40 @@ public class ViewerController extends Application {
 
         infoText.setWrapText(true);
 
-        CheckBox showWireframe = new CheckBox("Nur Wireframe anzeigen");
-        showWireframe.setOnAction(e -> {
-            if (meshView != null)
-            {
-                if (showWireframe.isSelected())
-                {
-                    meshView.setDrawMode(DrawMode.LINE);
-                }
-                else
-                {
-                    meshView.setDrawMode(DrawMode.FILL);
-                }
-            }
-        });
+        showWireframe = new CheckBox("Nur Wireframe anzeigen");
+        showWireframe.setOnAction(e -> updateDrawMode());
 
-        VBox box = new VBox(15, title, infoText, showWireframe);
-        box.setStyle("-fx-background-color: rgba(255,255,255,0.95); -fx-padding: 20; -fx-min-width: 250;");
-        return box;
+        showAxis = new CheckBox("Koordinatensystem anzeigen");
+        showAxis.setSelected(true);
+        showAxis.setOnAction(e -> updateShowAxis());
+
+        VBox sidebar = new VBox(15, title, infoText, showWireframe, showAxis);
+        sidebar.setStyle("-fx-background-color: rgba(255,255,255,0.95); -fx-padding: 20; -fx-min-width: 250;");
+        return sidebar;
     }
 
-    private Group setupLighting() {
+    private void updateShowAxis()
+    {
+        axesGroup.setVisible(showAxis.isSelected());
+    }
+
+    private void updateDrawMode()
+    {
+        if (meshView != null && showWireframe != null)
+        {
+            if (showWireframe.isSelected())
+            {
+                meshView.setDrawMode(DrawMode.LINE);
+            }
+            else
+            {
+                meshView.setDrawMode(DrawMode.FILL);
+            }
+        }
+    }
+
+    private Group setupLighting()
+    {
         AmbientLight ambient = new AmbientLight(Color.color(0.3, 0.3, 0.3));
         PointLight key = new PointLight(Color.WHITE);
         key.setTranslateX(-500);
@@ -250,7 +231,8 @@ public class ViewerController extends Application {
         return new Group(ambient, key, fill);
     }
 
-    private Group createCoordinateAxes() {
+    private Group createCoordinateAxes()
+    {
         double axisLength = 200;
         Cylinder x = new Cylinder(0.2, axisLength);
         x.setMaterial(new PhongMaterial(Color.RED));
@@ -265,17 +247,19 @@ public class ViewerController extends Application {
         z.setRotationAxis(Rotate.X_AXIS);
         z.setRotate(90);
 
-        Group grid = createGridPlane(100, 10);
+        Group grid = createGrid(100, 10);
 
         return new Group(x, y, z, grid);
     }
 
-    private Group createGridPlane(int size, int step) {
+    public Group createGrid(int size, int step)
+    {
         Group gridGroup = new Group();
         Color gridColor = Color.GRAY;
         double thickness = 0.05;
 
-        for (int i = -size; i <= size; i += step) {
+        for (int i = -size; i <= size; i += step)
+        {
             // Vertikale Linie (parallel zur Y-Achse)
             Box vLine = new Box(thickness, size * 2, thickness);
             vLine.setMaterial(new PhongMaterial(gridColor));
@@ -296,7 +280,8 @@ public class ViewerController extends Application {
         return gridGroup;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         launch(args);
     }
 }

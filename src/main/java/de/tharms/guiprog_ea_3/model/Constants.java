@@ -52,4 +52,5 @@ public interface Constants
     String NO_ARGUMENT = "Es wurde kein Argument übergeben";
     String OUTPUT_UNITS_MILLISECONDS = " ms";
     String OUTPUT_TIME_PASSED = "Benötigte Zeit: ";
+    String SAMPLE_STL_FILEPATH = "./src/main/resources/cube_ascii.stl";
 }
