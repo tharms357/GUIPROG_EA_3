@@ -1,6 +1,5 @@
 package de.tharms.guiprog_ea_3.view;
 
-import de.tharms.guiprog_ea_3.model.Constants;
 import de.tharms.guiprog_ea_3.utility.STLReader;
 import javafx.application.Application;
 import javafx.scene.*;
@@ -15,10 +14,8 @@ import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.MeshView;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.File;
 
 public class ViewerController extends Application
 {
@@ -30,11 +27,10 @@ public class ViewerController extends Application
 
     private MeshView meshView;
 
-    private CheckBox showWireframe;
-    private CheckBox showAxis;
 
     private CameraController cameraController;
     private ModelController modelController;
+    private UIController uiController;
 
     @Override
     public void start(Stage primaryStage)
@@ -48,8 +44,9 @@ public class ViewerController extends Application
 
     private Scene buildMainScene()
     {
-        MenuBar menuBar = createMenuBar();
-        VBox rightSidebar = createSidebar();
+        uiController = new UIController(this);
+        MenuBar menuBar = uiController.createMenuBar();
+        VBox rightSidebar = uiController.createSidebar();
         SubScene subScene = create3DSubScene();
 
         AnchorPane overlay = new AnchorPane(rightSidebar);
@@ -70,65 +67,6 @@ public class ViewerController extends Application
         return scene;
     }
 
-    //TODO modularisieren
-    private MenuBar createMenuBar()
-    {
-        Menu datei = new Menu("Datei");
-
-        MenuItem loadSampleSTL = new MenuItem("Beispiel STL-Datei laden");
-        loadSampleSTL.setOnAction(e -> {
-            setMeshView(Constants.SAMPLE_STL_FILEPATH);
-            modelController.resetModel();
-        });
-
-        MenuItem openFile = new MenuItem("STL-Datei öffnen...");
-        openFile.setOnAction(e -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("STL-Datei auswählen");
-
-            File selectedFile = fileChooser.showOpenDialog(null);
-            if (selectedFile != null)
-            {
-                setMeshView(selectedFile.getAbsolutePath());
-            }
-        });
-
-        MenuItem beenden = new MenuItem("Beenden");
-        beenden.setOnAction(e -> System.exit(0));
-
-        datei.getItems().addAll(loadSampleSTL, openFile, beenden);
-
-        // Ansicht-Menü mit Rücksetzfunktionen
-        Menu ansicht = new Menu("Ansicht");
-        MenuItem resetModel = new MenuItem("Modell-Position zurücksetzen");
-        MenuItem resetView = new MenuItem("Koordinatensystem zurücksetzen");
-
-        resetModel.setOnAction(e -> {
-            modelController.resetModel();
-        });
-
-        resetView.setOnAction(e -> {
-            cameraController.resetView();
-            showAxis.setSelected(true);
-            showAxis.setVisible(true);
-            updateShowAxis();
-        });
-
-        ansicht.getItems().addAll(resetModel, resetView);
-
-        Menu hilfe = new Menu("Hilfe");
-        MenuItem über = new MenuItem("Über STL Viewer");
-        über.setOnAction(e -> {
-            Alert info = new Alert(Alert.AlertType.INFORMATION);
-            info.setTitle("Über");
-            info.setHeaderText("STL Viewer");
-            info.setContentText("Ein einfacher 3D STL-Viewer\nAutor: Du :)");
-            info.showAndWait();
-        });
-        hilfe.getItems().add(über);
-
-        return new MenuBar(datei, ansicht, hilfe);
-    }
 
     private SubScene create3DSubScene()
     {
@@ -154,7 +92,7 @@ public class ViewerController extends Application
         return subScene;
     }
 
-    private void setMeshView(String filepath)
+    public void setMeshView(String filepath)
     {
         meshView = PolyhedronRenderer.createMesh(
                 STLReader.createPolyhedronFromSTL(filepath));
@@ -166,47 +104,19 @@ public class ViewerController extends Application
         }
 
         modelController.setMesh(meshView);
-        updateDrawMode();
     }
 
-    //TODO modularisieren
-    private VBox createSidebar()
+
+    public void updateShowAxis(boolean visible)
     {
-        Label title = new Label("Modell-Informationen");
-        title.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
-
-        Label infoText = new Label("""
-        - Modell: Felge_a.stl
-        - Eckpunkte: ca. 12.000
-        - Koordinatenursprung: (0,0,0)
-        - Skalierung: 1.0x
-        - Material: Phong
-    """);
-
-        infoText.setWrapText(true);
-
-        showWireframe = new CheckBox("Nur Wireframe anzeigen");
-        showWireframe.setOnAction(e -> updateDrawMode());
-
-        showAxis = new CheckBox("Koordinatensystem anzeigen");
-        showAxis.setSelected(true);
-        showAxis.setOnAction(e -> updateShowAxis());
-
-        VBox sidebar = new VBox(15, title, infoText, showWireframe, showAxis);
-        sidebar.setStyle("-fx-background-color: rgba(255,255,255,0.95); -fx-padding: 20; -fx-min-width: 250;");
-        return sidebar;
+        axesGroup.setVisible(visible);
     }
 
-    private void updateShowAxis()
+    public void updateDrawMode(boolean wireframe)
     {
-        axesGroup.setVisible(showAxis.isSelected());
-    }
-
-    private void updateDrawMode()
-    {
-        if (meshView != null && showWireframe != null)
+        if (meshView != null)
         {
-            if (showWireframe.isSelected())
+            if (wireframe)
             {
                 meshView.setDrawMode(DrawMode.LINE);
             }
@@ -214,6 +124,21 @@ public class ViewerController extends Application
             {
                 meshView.setDrawMode(DrawMode.FILL);
             }
+        }
+    }
+    public void resetModel()
+    {
+        if (modelController != null)
+        {
+            modelController.resetModel();
+        }
+    }
+
+    public void resetCameraView()
+    {
+        if (cameraController != null)
+        {
+            cameraController.resetView();
         }
     }
 
