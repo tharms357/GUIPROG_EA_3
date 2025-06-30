@@ -75,7 +75,7 @@ public class STLReader
      * @Vorbedingung facesByLine ist und filename sind nicht null.
      * @Nachbedingung Gibt ein korrekt erzeugtes {@link Polyhedron}-Objekt zurück.
      */
-    public static Polyhedron readASCII(List<String[]> facesByLine, String filename)
+    private static Polyhedron readASCII(List<String[]> facesByLine, String filename)
     {
         List<Face> faces = new ArrayList<>();
 
@@ -174,7 +174,7 @@ public class STLReader
         try
         {
             Vector3D normal = new Vector3D(
-                    Float.parseFloat(values[Constants.INDEX_ONE]),
+                    Float.parseFloat(values[Constants.INDEX_ZERO]),
                     Float.parseFloat(values[Constants.INDEX_ONE]),
                     Float.parseFloat(values[Constants.INDEX_TWO]));
             return normal;

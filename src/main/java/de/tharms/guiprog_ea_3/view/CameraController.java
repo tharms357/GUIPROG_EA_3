@@ -20,7 +20,8 @@ public class CameraController {
     private double anchorX, anchorY;
     private double anchorAngleX, anchorAngleY;
 
-    public CameraController(Group sceneRoot, Rotate rotateY, Rotate rotateX) {
+    public CameraController(Group sceneRoot, Rotate rotateY, Rotate rotateX)
+    {
         this.externalRotateX = rotateX;
         this.externalRotateY = rotateY;
 
@@ -33,43 +34,50 @@ public class CameraController {
         resetView();
     }
 
-    public Group getRootGroup() {
+    public Group getRootGroup()
+    {
         return rootGroup;
     }
 
-    public PerspectiveCamera getCamera() {
+    public PerspectiveCamera getCamera()
+    {
         return camera;
     }
 
-    public void attachMouseControl(SubScene scene) {
-        scene.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> onMousePressed(e));
-        scene.addEventHandler(MouseEvent.MOUSE_DRAGGED, e -> onMouseDragged(e));
-        scene.addEventHandler(ScrollEvent.SCROLL, e -> onScroll(e));
+    public void attachMouseControl(SubScene scene)
+    {
+        scene.addEventHandler(MouseEvent.MOUSE_PRESSED, mouseEvent -> mouseIsPressed(mouseEvent));
+        scene.addEventHandler(MouseEvent.MOUSE_DRAGGED, mouseEvent -> mouseIsDragged(mouseEvent));
+        scene.addEventHandler(ScrollEvent.SCROLL, scrollEvent -> isScrolled(scrollEvent));
     }
 
-    private void onMousePressed(MouseEvent e) {
-        anchorX = e.getSceneX();
-        anchorY = e.getSceneY();
+    private void mouseIsPressed(MouseEvent mouseEvent)
+    {
+        anchorX = mouseEvent.getSceneX();
+        anchorY = mouseEvent.getSceneY();
         anchorAngleX = externalRotateX.getAngle();
         anchorAngleY = externalRotateY.getAngle();
     }
 
-    private void onMouseDragged(MouseEvent e) {
-        double deltaX = e.getSceneX() - anchorX;
-        double deltaY = e.getSceneY() - anchorY;
+    private void mouseIsDragged(MouseEvent mouseEvent)
+    {
+        double deltaX = mouseEvent.getSceneX() - anchorX;
+        double deltaY = mouseEvent.getSceneY() - anchorY;
 
-        if (e.getButton() == MouseButton.PRIMARY && e.isShiftDown()) {
-            externalRotateY.setAngle(anchorAngleY - deltaX * 0.01);
-            externalRotateX.setAngle(anchorAngleX + deltaY * 0.01);
+        if (mouseEvent.getButton() == MouseButton.PRIMARY && mouseEvent.isShiftDown())
+        {
+            externalRotateY.setAngle(anchorAngleY - deltaX * 0.1);
+            externalRotateX.setAngle(anchorAngleX + deltaY * 0.1);
         }
     }
 
-    private void onScroll(ScrollEvent e) {
-        double zoom = cameraTranslate.getZ() + e.getDeltaY() * 0.5;
+    private void isScrolled(ScrollEvent scrollEvent) {
+        double zoom = cameraTranslate.getZ() + scrollEvent.getDeltaY() * 0.5;
         cameraTranslate.setZ(Math.max(-10000, Math.min(-100, zoom)));
     }
 
-    public void resetView() {
+    public void resetView()
+    {
         externalRotateX.setAngle(-235);
         externalRotateY.setAngle(0);
         translate.setZ(-800);

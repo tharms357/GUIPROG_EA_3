@@ -29,22 +29,6 @@ public class Vertex
     }
 
     /**
-     * Berechnet die Distanz zwischen diesem Vertex und einem anderen.
-     *
-     * @param other Der andere Vertex.
-     * @return Die Distanz als {@code float}.
-     *
-     * @Vorbedingung other ist nicht null
-     * @Nachbedingung Gibt die Distanz zwischen beiden Punkten zurück.
-     */
-    public float getDistanceTo(Vertex other)
-    {
-        return (float) Math.sqrt(Math.pow(this.getX()-other.getX(), Constants.SQUARED) +
-                Math.pow(this.getY()-other.getY(), Constants.SQUARED) +
-                Math.pow(this.getZ()-other.getZ(), Constants.SQUARED));
-    }
-
-    /**
      * Wandelt diesen Vertex in einen {@link Vector3D} als Richtungsvektor aus dem Ursprung um.
      *
      * @return Ein {@link Vector3D}-Objekt mit denselben Koordinaten.

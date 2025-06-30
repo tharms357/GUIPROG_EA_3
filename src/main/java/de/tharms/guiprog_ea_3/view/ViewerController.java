@@ -1,5 +1,6 @@
 package de.tharms.guiprog_ea_3.view;
 
+import de.tharms.guiprog_ea_3.controller.PolyhedronController;
 import de.tharms.guiprog_ea_3.model.Constants;
 import de.tharms.guiprog_ea_3.utility.STLReader;
 import javafx.application.Application;
@@ -14,7 +15,6 @@ import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.MeshView;
 import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -142,7 +142,7 @@ public class ViewerController extends Application
 
         axesGroup.getChildren().add(createCoordinateAxes());
 
-        sceneRoot.getChildren().addAll(modelController.getModelGroup(), axesGroup, setupLighting());
+        sceneRoot.getChildren().addAll(modelController.getModelGroup(), axesGroup);
 
         SubScene subScene = new SubScene(cameraController.getRootGroup(), 1000, 700, true, SceneAntialiasing.BALANCED);
         subScene.setFill(Color.LIGHTGRAY);
@@ -156,13 +156,13 @@ public class ViewerController extends Application
 
     private void setMeshView(String filepath)
     {
-        meshView = PolyhedronRenderer.createMesh(
+        meshView = PolyhedronController.createMesh(
                 STLReader.createPolyhedronFromSTL(filepath));
 
         if (meshView.getMaterial() == null)
         {
             //TODO methode für setdefaults
-            meshView.setMaterial(new PhongMaterial(Color.GREEN));
+            meshView.setMaterial(new PhongMaterial(Color.DARKGRAY));
         }
 
         modelController.setMesh(meshView);
@@ -217,19 +217,7 @@ public class ViewerController extends Application
         }
     }
 
-    private Group setupLighting()
-    {
-        AmbientLight ambient = new AmbientLight(Color.color(0.3, 0.3, 0.3));
-        PointLight key = new PointLight(Color.WHITE);
-        key.setTranslateX(-500);
-        key.setTranslateY(-300);
-        key.setTranslateZ(-700);
-        PointLight fill = new PointLight(Color.color(0.7, 0.7, 0.7));
-        fill.setTranslateX(400);
-        fill.setTranslateY(300);
-        fill.setTranslateZ(600);
-        return new Group(ambient, key, fill);
-    }
+
 
     private Group createCoordinateAxes()
     {

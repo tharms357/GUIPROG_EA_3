@@ -2,7 +2,9 @@ package de.tharms.guiprog_ea_3.main;
 
 import de.tharms.guiprog_ea_3.controller.ArgumentController;
 import de.tharms.guiprog_ea_3.controller.PolyhedronController;
+import de.tharms.guiprog_ea_3.model.Face;
 import de.tharms.guiprog_ea_3.model.Polyhedron;
+import de.tharms.guiprog_ea_3.model.Vertex;
 import de.tharms.guiprog_ea_3.utility.STLReader;
 import de.tharms.guiprog_ea_3.view.Output;
 

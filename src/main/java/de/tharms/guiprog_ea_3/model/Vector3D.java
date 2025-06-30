@@ -25,6 +25,7 @@ public class Vector3D
         this.z = z;
     }
 
+
     /**
      * Berechnet einen Richtungsvektor vom Punkt {@code vertex1} zum Punkt {@code vertex2}.
      *
@@ -87,18 +88,6 @@ public class Vector3D
         return this.getX() * other.getX() + this.getY() * other.getY() + this.getZ() * other.getZ();
     }
 
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
-    }
-
-    public float getZ() {
-        return z;
-    }
-
     /**
      * Formatiert das x, y und z des Vektors zu einem lesbaren String.
      *
@@ -111,4 +100,30 @@ public class Vector3D
     public String toString() {
         return Constants.OUTPUT_NORMAL + Constants.OUTPUT_SEPARATOR + x + Constants.OUTPUT_SEPARATOR + y + Constants.OUTPUT_SEPARATOR + z;
     }
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public float getZ() {
+        return z;
+    }
+
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setZ(float z) {
+        this.z = z;
+    }
+
+
 }

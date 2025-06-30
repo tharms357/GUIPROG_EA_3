@@ -33,7 +33,7 @@ public interface Constants
     String OUTPUT_AREA = "Flächeninhalt: ";
     String STL_ASCII_KEYWORD_OUTER_LOOP = "outer loop";
     String STL_ASCII_KEYWORD_ENDLOOP = "endloop";
-    String INVALID_FACE_VERTEX = "Vertex vom Face ist ungülig";
+    String INVALID_FACE_VERTEX = "Vertex vom Face ist ungültig";
     String STL_ASCII_KEYWORD_VERTEX = "vertex";
     String EMPTY_STRING = "";
     String STL_ASCII_SPLIT_VERTICES_REGEX = "^vertex\\s+";

@@ -23,34 +23,7 @@ public class Edge
             this.end = end;
         }
 
-        /**
-         * Prüft, ob diese Kante mit einem gegebenen {@link Vertex} verbunden ist (als Endpunkt).
-         *
-         * @param other Der zu prüfende {@link Vertex}.
-         * @return {@code true}, wenn der gegebene Vertex dem Endpunkt der Kante entspricht, sonst {@code false}.
-         *
-         * @Vorbedingung Vertex other ist nicht null
-         * @Nachbedingung Gibt {@code true} zurück, falls der Endpunkt der Kante gleich dem gegebenen Vertex ist.
-         */
-        public boolean isConnected(Vertex other)
-        {
-            return (this.end.equals(other));
-        }
-
-        /**
-         * Berechnet die Länge der Kante basierend auf der Distanz zwischen Start- und Endpunkt.
-         *
-         * @return Die Länge der Kante als {@code float}.
-         *
-         * @Vorbedingung Start- und Endpunkt sind gültig initialisiert.
-         * @Nachbedingung Gibt die Distanz zwischen Start und Ende zurück.
-         */
-        public float getLength()
-        {
-            return this.start.getDistanceTo(this.end);
-        }
-
-        /**
+    /**
          * Gibt die beiden Endpunkte der Kante als Liste zurück.
          *
          * @return Eine {@link List} mit zwei {@link Vertex}-Objekten: Start- und Endpunkt.
@@ -78,7 +51,7 @@ public class Edge
         /**
          * Vergleicht diese Kante mit einem anderen Objekt auf Gleichheit.
          *
-         * @param object Das zu vergleichende Objekt.
+         * @param obj Das zu vergleichende Objekt.
          * @return {@code true}, wenn beide Kanten dieselben start und end (unabhängig von der Reihenfolge),
          * sonst {@code false}.
          *

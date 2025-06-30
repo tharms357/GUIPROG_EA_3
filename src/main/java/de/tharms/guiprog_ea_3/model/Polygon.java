@@ -37,7 +37,25 @@ public class Polygon
      */
     public float calculateArea()
     {
-        return 0;
+        Vector3D areaVector = new Vector3D(0, 0, 0);
+        int numberOfVertices = this.getVertices().size();
+
+        for (int i = 0; i < numberOfVertices; i++)
+        {
+            Vertex currentVertex = this.getVertices().get(i);
+            Vertex nextVertex = this.getVertices().get((i + 1) % numberOfVertices);
+
+            areaVector.setX(areaVector.getX() + (currentVertex.getY() - nextVertex.getY()) *
+                    (currentVertex.getZ() + nextVertex.getZ()));
+
+            areaVector.setY(areaVector.getY() + (currentVertex.getZ() - nextVertex.getZ()) *
+                    (currentVertex.getX() + nextVertex.getX()));
+
+            areaVector.setZ(areaVector.getZ() + (currentVertex.getX() - nextVertex.getX()) *
+                    (currentVertex.getY() + nextVertex.getY()));
+        }
+
+        return (float) 0.5 * areaVector.getLength();
     }
 
     public List<Vertex> getVertices()
