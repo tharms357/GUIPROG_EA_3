@@ -1,61 +1,124 @@
 package de.tharms.guiprog_ea_3.view;
 
+import de.tharms.guiprog_ea_3.controller.CameraController;
+import de.tharms.guiprog_ea_3.controller.ModelController;
 import de.tharms.guiprog_ea_3.controller.PolyhedronController;
+import de.tharms.guiprog_ea_3.controller.InteractionController;
 import de.tharms.guiprog_ea_3.model.Constants;
-import de.tharms.guiprog_ea_3.utility.STLReader;
+import de.tharms.guiprog_ea_3.network.Server;
 import javafx.application.Application;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
-import javafx.scene.shape.Cylinder;
-import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.MeshView;
-import javafx.scene.transform.Rotate;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.File;
-
+/**
+ * Haupt-Controller für die JavaFX-Anwendung des STL-Viewers.
+ * Initialisiert Stage, Scene und SubScene sowie die Anzeige des geladenen Polyeders.
+ */
 public class ViewerController extends Application
 {
+    //private final Rotate cameraRotateX = new Rotate(0, Rotate.X_AXIS);
+    //private final Rotate cameraRotateY = new Rotate(0, Rotate.Y_AXIS);
 
-    private Group sceneRoot = new Group();
-    private final Group axesGroup = new Group();
-    private final Rotate cameraRotateX = new Rotate(0, Rotate.X_AXIS);
-    private final Rotate cameraRotateY = new Rotate(0, Rotate.Y_AXIS);
+    public final Group axesGroup = new Group();
 
-    private MeshView meshView;
+    private Stage primaryStage;
 
-    private CheckBox showWireframe;
-    private CheckBox showAxis;
-
+    private InteractionController interactionController;
     private CameraController cameraController;
     private ModelController modelController;
+    private PolyhedronController polyhedronController;
 
+    private Server server;
+
+    public void startServer()
+    {
+        server = new Server(10002, this);
+        server.start();
+    }
+
+    public void closeServer()
+    {
+        server.close();
+    }
+
+    /**
+     * Startmethode der JavaFX-Anwendung. Setzt die primaryStage und zeigt die Hauptszene an.
+     *
+     * @param primaryStage Die primäre Stage.
+     * @Vorbedingung primaryStage darf nicht null sein.
+     * @Nachbedingung Die Stage zeigt die geladene Szene mit Menüs und 3D-Ansicht.
+     */
     @Override
     public void start(Stage primaryStage)
     {
+        this.primaryStage = primaryStage;
+
         Scene scene = buildMainScene();
         primaryStage.setScene(scene);
-        primaryStage.setTitle("STL Viewer");
-        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/stl_viewer_icon.png")));
+        setProgramTitle(Constants.EMPTY_STRING);
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream(Constants.STL_VIEWER_ICON_FILEPATH)));
         primaryStage.show();
+
+        startServer();
     }
 
+    /**
+     * Hauptmethode, die die JavaFX-Anwendung startet.
+     *
+     * @param args Kommandozeilenargumente.
+     * @Vorbedingung Keine.
+     * @Nachbedingung Die Anwendung ist gestartet.
+     */
+    public static void main(String[] args)
+    {
+        launch(args);
+    }
+
+    /**
+     * Setzt den Programmtitel in der Titelleiste, optional mit Polyedername.
+     *
+     * @param polyhedronName Der Name des aktuell geladenen Polyeders oder ein leerer String.
+     * @Vorbedingung primaryStage ist initialisiert.
+     * @Nachbedingung Der Fenstertitel enthält den Standardtitel und ggf. den Polyedernamen.
+     */
+    private void setProgramTitle(String polyhedronName)
+    {
+        if (!polyhedronName.isEmpty())
+        {
+            primaryStage.setTitle(
+                    Constants.DEFAULT_PROGRAM_TITLE + Constants.SEPERATOR + polyhedronName);
+        }
+       else
+       {
+           primaryStage.setTitle(Constants.DEFAULT_PROGRAM_TITLE);
+       }
+    }
+
+    /**
+     * Baut die Hauptszene mit Menüleiste, Seitenleiste und 3D-SubScene.
+     *
+     * @return Die konfigurierte Haupt-{@link Scene} für das Programmfenster.
+     * @Vorbedingung Keine.
+     * @Nachbedingung Die erstellte Szene ist vollständig konfiguriert.
+     */
     private Scene buildMainScene()
     {
-        MenuBar menuBar = createMenuBar();
-        VBox rightSidebar = createSidebar();
+        interactionController = new InteractionController();
+
+        MenuBar menuBar = interactionController.createMenuBar(this);
+        VBox rightSidebar = interactionController.createSidebar(this);
+
         SubScene subScene = create3DSubScene();
 
         AnchorPane overlay = new AnchorPane(rightSidebar);
         AnchorPane.setTopAnchor(rightSidebar, 0.0);
         AnchorPane.setRightAnchor(rightSidebar, 0.0);
-        overlay.setPickOnBounds(false); // 3D-Eingabe bleibt möglich
+        overlay.setPickOnBounds(false);
 
         StackPane centerStack = new StackPane(subScene, overlay);
 
@@ -63,213 +126,95 @@ public class ViewerController extends Application
         root.setTop(menuBar);
         root.setCenter(centerStack);
 
-        Scene scene = new Scene(root, 1200, 800);
+        Scene scene = new Scene(root, Constants.STL_VIEWER_WINDOW_WIDTH, Constants.STL_VIEWER_WINDOW_HEIGHT);
         subScene.widthProperty().bind(centerStack.widthProperty());
         subScene.heightProperty().bind(centerStack.heightProperty());
 
         return scene;
     }
 
-    //TODO modularisieren
-    private MenuBar createMenuBar()
-    {
-        Menu datei = new Menu("Datei");
-
-        MenuItem loadSampleSTL = new MenuItem("Beispiel STL-Datei laden");
-        loadSampleSTL.setOnAction(e -> {
-            setMeshView(Constants.SAMPLE_STL_FILEPATH);
-            modelController.resetModel();
-        });
-
-        MenuItem openFile = new MenuItem("STL-Datei öffnen...");
-        openFile.setOnAction(e -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("STL-Datei auswählen");
-
-            File selectedFile = fileChooser.showOpenDialog(null);
-            if (selectedFile != null)
-            {
-                setMeshView(selectedFile.getAbsolutePath());
-            }
-        });
-
-        MenuItem beenden = new MenuItem("Beenden");
-        beenden.setOnAction(e -> System.exit(0));
-
-        datei.getItems().addAll(loadSampleSTL, openFile, beenden);
-
-        // Ansicht-Menü mit Rücksetzfunktionen
-        Menu ansicht = new Menu("Ansicht");
-        MenuItem resetModel = new MenuItem("Modell-Position zurücksetzen");
-        MenuItem resetView = new MenuItem("Koordinatensystem zurücksetzen");
-
-        resetModel.setOnAction(e -> {
-            modelController.resetModel();
-        });
-
-        resetView.setOnAction(e -> {
-            cameraController.resetView();
-            showAxis.setSelected(true);
-            showAxis.setVisible(true);
-            updateShowAxis();
-        });
-
-        ansicht.getItems().addAll(resetModel, resetView);
-
-        Menu hilfe = new Menu("Hilfe");
-        MenuItem über = new MenuItem("Über STL Viewer");
-        über.setOnAction(e -> {
-            Alert info = new Alert(Alert.AlertType.INFORMATION);
-            info.setTitle("Über");
-            info.setHeaderText("STL Viewer");
-            info.setContentText("Ein einfacher 3D STL-Viewer\nAutor: Du :)");
-            info.showAndWait();
-        });
-        hilfe.getItems().add(über);
-
-        return new MenuBar(datei, ansicht, hilfe);
-    }
-
+    /**
+     * Erstellt und konfiguriert die 3D-SubScene mit Kamera, Modell und Koordinatensystem.
+     *
+     * @return Die erstellte 3D-{@link SubScene}.
+     * @Vorbedingung Keine.
+     * @Nachbedingung Die SubScene vollständig aufgestellt.
+     */
     private SubScene create3DSubScene()
     {
-        sceneRoot = new Group();
-        sceneRoot.getTransforms().addAll(cameraRotateY, cameraRotateX);
+        Group sceneRoot = new Group();
+        Group cameraRoot = new Group();
+        //sceneRoot.getTransforms().addAll(cameraRotateY, cameraRotateX);
 
         modelController = new ModelController();
-        cameraController = new CameraController(sceneRoot, cameraRotateY, cameraRotateX);
+        //cameraController = new CameraController(sceneRoot, cameraRotateY, cameraRotateX);
+        cameraController = new CameraController();
 
-        //setMeshView(Constants.DEFAULT_FILEPATH + "cube_ascii.stl");
+        sceneRoot.getChildren().addAll(modelController.getModelGroup(), interactionController.createCoordinateAxes(), cameraController.getCameraGroup());
 
-        axesGroup.getChildren().add(createCoordinateAxes());
-
-        sceneRoot.getChildren().addAll(modelController.getModelGroup(), axesGroup);
-
-        SubScene subScene = new SubScene(cameraController.getRootGroup(), 1000, 700, true, SceneAntialiasing.BALANCED);
+        SubScene subScene = new SubScene(sceneRoot, Constants.STL_VIEWER_SUBSCENE_WIDTH,
+                Constants.STL_VIEWER_SUBSCENE_HEIGHT, true, SceneAntialiasing.BALANCED);
         subScene.setFill(Color.LIGHTGRAY);
         subScene.setCamera(cameraController.getCamera());
 
-        cameraController.attachMouseControl(subScene);
-        modelController.attachMouseControl(subScene);
+        interactionController.addMouseControl(subScene, modelController, cameraController);
 
         return subScene;
     }
 
-    private void setMeshView(String filepath)
+    /**
+     * Aktualisiert die Sichtbarkeit des Koordinatensystems basierend auf der Checkbox.
+     *
+     * @Vorbedingung uiController ist initialisiert.
+     * @Nachbedingung axesGroup ist sichtbar oder unsichtbar gemäß Auswahl.
+     */
+    public void updateShowAxis()
     {
-        meshView = PolyhedronController.createMesh(
-                STLReader.createPolyhedronFromSTL(filepath));
-
-        if (meshView.getMaterial() == null)
+        axesGroup.setVisible(interactionController.getShowAxis().isSelected());
+        if (interactionController.getShowAxis() != null)
         {
-            //TODO methode für setdefaults
-            meshView.setMaterial(new PhongMaterial(Color.DARKGRAY));
-        }
-
-        modelController.setMesh(meshView);
-        updateDrawMode();
-    }
-
-    //TODO modularisieren
-    private VBox createSidebar()
-    {
-        Label title = new Label("Modell-Informationen");
-        title.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
-
-        Label infoText = new Label("""
-        - Modell: Felge_a.stl
-        - Eckpunkte: ca. 12.000
-        - Koordinatenursprung: (0,0,0)
-        - Skalierung: 1.0x
-        - Material: Phong
-    """);
-
-        infoText.setWrapText(true);
-
-        showWireframe = new CheckBox("Nur Wireframe anzeigen");
-        showWireframe.setOnAction(e -> updateDrawMode());
-
-        showAxis = new CheckBox("Koordinatensystem anzeigen");
-        showAxis.setSelected(true);
-        showAxis.setOnAction(e -> updateShowAxis());
-
-        VBox sidebar = new VBox(15, title, infoText, showWireframe, showAxis);
-        sidebar.setStyle("-fx-background-color: rgba(255,255,255,0.95); -fx-padding: 20; -fx-min-width: 250;");
-        return sidebar;
-    }
-
-    private void updateShowAxis()
-    {
-        axesGroup.setVisible(showAxis.isSelected());
-    }
-
-    private void updateDrawMode()
-    {
-        if (meshView != null && showWireframe != null)
-        {
-            if (showWireframe.isSelected())
-            {
-                meshView.setDrawMode(DrawMode.LINE);
-            }
-            else
-            {
-                meshView.setDrawMode(DrawMode.FILL);
-            }
+            axesGroup.setVisible(interactionController.getShowAxis().isSelected());
         }
     }
 
 
 
-    private Group createCoordinateAxes()
+    /**
+     * Lädt ein Polyeder, erstellt ein Mesh und aktualisiert die Anzeige und Details.
+     *
+     * @param filepath Pfad zur STL-Datei.
+     * @Vorbedingung filepath verweist auf eine gültige STL-Datei.
+     * @Nachbedingung Das Modell, die Darstellungsoptionen und Details werden aktualisiert.
+     */
+    public void setMeshView(String filepath)
     {
-        double axisLength = 200;
-        Cylinder x = new Cylinder(0.2, axisLength);
-        x.setMaterial(new PhongMaterial(Color.RED));
-        x.setRotationAxis(Rotate.Z_AXIS);
-        x.setRotate(90);
+        modelController.createPolyhedronFromFilepath(filepath);
 
-        Cylinder y = new Cylinder(0.2, axisLength);
-        y.setMaterial(new PhongMaterial(Color.GREEN));
+        MeshView mesh = PolyhedronController.createMesh(modelController.getPolyhedron());
 
-        Cylinder z = new Cylinder(0.2, axisLength);
-        z.setMaterial(new PhongMaterial(Color.BLUE));
-        z.setRotationAxis(Rotate.X_AXIS);
-        z.setRotate(90);
-
-        Group grid = createGrid(100, 10);
-
-        return new Group(x, y, z, grid);
+        modelController.setMesh(mesh);
+        interactionController.updateDrawMode(mesh);
+        interactionController.refreshPolyhedronDetails(modelController.getPolyhedron());
+        setProgramTitle(modelController.getPolyhedron().getName());
     }
 
-    public Group createGrid(int size, int step)
+    public InteractionController getUiController()
     {
-        Group gridGroup = new Group();
-        Color gridColor = Color.GRAY;
-        double thickness = 0.05;
-
-        for (int i = -size; i <= size; i += step)
-        {
-            // Vertikale Linie (parallel zur Y-Achse)
-            Box vLine = new Box(thickness, size * 2, thickness);
-            vLine.setMaterial(new PhongMaterial(gridColor));
-            vLine.setTranslateX(i);
-            vLine.setTranslateY(0);
-            vLine.setTranslateZ(0);
-
-            // Horizontale Linie (parallel zur X-Achse)
-            Box hLine = new Box(size * 2, thickness, thickness);
-            hLine.setMaterial(new PhongMaterial(gridColor));
-            hLine.setTranslateX(0);
-            hLine.setTranslateY(i);
-            hLine.setTranslateZ(0);
-
-            gridGroup.getChildren().addAll(vLine, hLine);
-        }
-
-        return gridGroup;
+        return interactionController;
     }
 
-    public static void main(String[] args)
+    public CameraController getCameraController()
     {
-        launch(args);
+        return cameraController;
+    }
+
+    public ModelController getModelController()
+    {
+        return modelController;
+    }
+
+    public PolyhedronController getPolyhedronController()
+    {
+        return polyhedronController;
     }
 }

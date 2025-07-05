@@ -23,7 +23,8 @@ public class Polygon
         this.edges = edges;
     }
 
-    public List<Edge> getEdges() {
+    public List<Edge> getEdges()
+    {
         return edges;
     }
 
@@ -43,21 +44,33 @@ public class Polygon
         for (int i = 0; i < numberOfVertices; i++)
         {
             Vertex currentVertex = this.getVertices().get(i);
-            Vertex nextVertex = this.getVertices().get((i + 1) % numberOfVertices);
+            Vertex nextVertex = this.getVertices().get(
+                    (i + Constants.NUMBERS_ONE) % numberOfVertices);
 
-            areaVector.setX(areaVector.getX() + (currentVertex.getY() - nextVertex.getY()) *
+            areaVector.setX(
+                    areaVector.getX() + (currentVertex.getY() - nextVertex.getY()) *
                     (currentVertex.getZ() + nextVertex.getZ()));
 
-            areaVector.setY(areaVector.getY() + (currentVertex.getZ() - nextVertex.getZ()) *
+            areaVector.setY(
+                    areaVector.getY() + (currentVertex.getZ() - nextVertex.getZ()) *
                     (currentVertex.getX() + nextVertex.getX()));
 
-            areaVector.setZ(areaVector.getZ() + (currentVertex.getX() - nextVertex.getX()) *
+            areaVector.setZ(
+                    areaVector.getZ() + (currentVertex.getX() - nextVertex.getX()) *
                     (currentVertex.getY() + nextVertex.getY()));
         }
 
-        return (float) 0.5 * areaVector.getLength();
+        return (float) (Constants.NUMBERS_ZERO_DOT_FIVE * areaVector.getLength());
     }
 
+    /**
+     * Liefert alle Start-Vertices der Kanten des Polygons.
+     * Die zurückgegebene Liste enthält für jede Kante genau einen Start-Vertex.
+     *
+     * @return Eine Liste der {@link Vertex}-Objekte, die den Startpunkt jeder Kante repräsentieren.
+     * @Vorbedingung Die interne Liste edges darf nicht null sein.
+     * @Nachbedingung Die zurückgegebene Liste enthält alle Start-Vertices in derselben Reihenfolge wie die Kanten.
+     */
     public List<Vertex> getVertices()
     {
         List<Vertex> vertices = new ArrayList<Vertex>();

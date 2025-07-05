@@ -2,12 +2,8 @@ package de.tharms.guiprog_ea_3.utility;
 
 import de.tharms.guiprog_ea_3.model.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,69 +14,26 @@ import java.util.List;
  */
 public class STLReader
 {
-    /**
-     * Erstellt ein {@link Polyhedron}-Objekt aus einer STL-Datei (ASCII- oder Binärformat).
-     *
-     * @param filepath Der Pfad zur STL-Datei.
-     * @return Ein {@link Polyhedron}-Objekt, das aus der Datei erzeugt wurde, oder {@code null} bei Fehlern.
-     *
-     * @Vorbedingung filepath ist ungleich null und endet mit dem gültigen Dateiformat
-     * @Nachbedingung Gibt ein gültiges {@link Polyhedron}-Objekt zurück oder {@code null}, falls ein Fehler auftrat.
-     */
-    public static Polyhedron createPolyhedronFromSTL(String filepath)
-    {
-        if (filepath == null || !filepath.endsWith(Constants.FILENAME_VALID_FORMAT))
-        {
-            throw new IllegalArgumentException(Constants.INVALID_FILE_FORMAT);
-        }
-
-        try
-        {
-            File file = new File(filepath);
-            byte[] data = new byte[(int) file.length()];
-
-            try (FileInputStream fileInputStream = new FileInputStream(file))
-            {
-                int bytesRead = fileInputStream.read(data);
-                if (bytesRead != data.length)
-                {
-                    throw new IOException(Constants.FILE_READING_ERROR + filepath);
-                }
-            }
-
-            String header = new String(data, 0, Constants.STL_BINARY_HEADER_LENGTH, StandardCharsets.US_ASCII);
-
-            if (header.trim().startsWith(Constants.STL_ASCII_KEYWORD_SOLID))
-            {
-                return readASCII(prepareASCIISTL(FileReader.lineReader(filepath)), filepath);
-            }
-            else
-            {
-                return createPolyhedronFromBinarySTL(data, filepath);
-            }
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     /**
      * Liest eine ASCII-STL-Datei und wandelt sie in ein {@link Polyhedron}-Objekt um.
      *
-     * @param facesByLine Die Listen der Zeileninhalte jedes Faces.
-     * @param filename Der Name der Datei.
+     * @param filepath Der Name der Datei.
      * @return Ein {@link Polyhedron}-Objekt, das aus den ASCII-Daten erzeugt wurde.
      *
-     * @Vorbedingung facesByLine ist und filename sind nicht null.
+     * @Vorbedingung facesByLine ist und filepath sind nicht null.
      * @Nachbedingung Gibt ein korrekt erzeugtes {@link Polyhedron}-Objekt zurück.
      */
-    private static Polyhedron readASCII(List<String[]> facesByLine, String filename)
+    public static Polyhedron createPolyhedronFromASCIISTL(String filepath)
     {
         List<Face> faces = new ArrayList<>();
+        String polyhedronName = filepath;
+        List<String[]> facesByLine = STLReader.prepareASCIISTL(FileReader.lineReader(filepath));
 
         if (Arrays.toString(facesByLine.getFirst()).contains(Constants.STL_ASCII_KEYWORD_SOLID))
         {
+            polyhedronName = facesByLine.getFirst()[0].replaceFirst(
+                    Constants.STL_ASCII_SPLIT_NAME_REGEX, Constants.EMPTY_STRING);
             facesByLine.removeFirst();
         }
 
@@ -91,7 +44,7 @@ public class STLReader
                 Face currentFace = new Face(
                         new Triangle(
                                 createEdgesFromLines(face)),
-                        createNormalFromLine(face[0]));
+                                createNormalFromLine(face[0]));
 
                 faces.add(currentFace);
             }
@@ -101,7 +54,7 @@ public class STLReader
             }
         }
 
-        Polyhedron polyhedron = new Polyhedron(faces, filename);
+        Polyhedron polyhedron = new Polyhedron(faces, polyhedronName);
 
         return polyhedron;
     }
@@ -196,10 +149,10 @@ public class STLReader
      */
     public static List<String[]> prepareASCIISTL(ArrayList<String> fileDataByLines)
     {
-        List<String[]> facets = new ArrayList<>();
+        List<String[]> faces = new ArrayList<>();
         List<String> currentFace = null;
 
-        facets.add(new String[]{fileDataByLines.getFirst().trim()});
+        faces.add(new String[]{fileDataByLines.getFirst().trim()});
 
         for (String rawLine : fileDataByLines)
         {
@@ -224,11 +177,11 @@ public class STLReader
                 if (currentFace != null)
                 {
                     currentFace.add(line);
-                    facets.add(currentFace.toArray(new String[currentFace.size()]));
+                    faces.add(currentFace.toArray(new String[currentFace.size()]));
                 }
             }
         }
-        return facets;
+        return faces;
     }
 
     /**
@@ -243,52 +196,51 @@ public class STLReader
      */
     public static Polyhedron createPolyhedronFromBinarySTL(byte[] data, String filename)
     {
-        List<Face> faces = new ArrayList<>();
-        ByteBuffer byteBuffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
+        byte[] header = Arrays.copyOfRange(data, 0, Constants.STL_BINARY_HEADER_LENGTH);
 
-        byteBuffer.position(Constants.STL_BINARY_HEADER_LENGTH);
+        String headerName = new String(header).trim();
+        String polyhedronName;
+
+        if (headerName.isEmpty())
+        {
+            polyhedronName = filename;
+        }
+        else
+        {
+            polyhedronName = headerName;
+        }
+
+        ByteBuffer byteBuffer = ByteBuffer
+                .wrap(data)
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .position(Constants.STL_BINARY_HEADER_LENGTH);
 
         int numberOfTriangles = byteBuffer.getInt();
+        List<Face> faces = new ArrayList<>(numberOfTriangles);
 
         for (int i = 0; i < numberOfTriangles; i++)
         {
-            float[] normalValues = new float[Constants.STL_NORMAL_NUMBER_OF_DIMENSIONS];
-
-            for (int j = 0; j < Constants.STL_NORMAL_NUMBER_OF_DIMENSIONS; j++)
-            {
-                normalValues[j] = byteBuffer.getFloat();
-            }
-
-            Vector3D normal = new Vector3D(
-                    normalValues[Constants.INDEX_ZERO],
-                    normalValues[Constants.INDEX_ONE],
-                    normalValues[Constants.INDEX_TWO]);
-
-            Vertex[] vertices = new Vertex[Constants.STL_NUMBER_OF_VERTICES];
-            for (int k = 0; k < Constants.STL_NUMBER_OF_VERTICES; k++)
-            {
-                float[] vertexValues = new float[Constants.STL_VERTEX_NUMBER_OF_DIMENSIONS];
-
-                for (int j = 0; j < Constants.STL_VERTEX_NUMBER_OF_DIMENSIONS; j++)
-                {
-                    vertexValues[j] = byteBuffer.getFloat();
-                }
-                vertices[k] = new Vertex(
-                        vertexValues[Constants.INDEX_ZERO],
-                        vertexValues[Constants.INDEX_ONE],
-                        vertexValues[Constants.INDEX_TWO]);
-            }
-
-            short attributes = byteBuffer.getShort();
-
-            faces.add(new Face
-                    (new Triangle(
-                            vertices[Constants.INDEX_ZERO],
-                            vertices[Constants.INDEX_ONE],
-                            vertices[Constants.INDEX_TWO]),
-                            normal));
+            faces.add(createFaceFromByteBuffer(byteBuffer));
         }
 
-        return new Polyhedron(faces, filename);
+        return new Polyhedron(faces, polyhedronName);
+    }
+
+    private static Face createFaceFromByteBuffer(ByteBuffer byteBuffer)
+    {
+        Vector3D normal = new Vector3D(
+                byteBuffer.getFloat(),
+                byteBuffer.getFloat(),
+                byteBuffer.getFloat()
+        );
+
+        Vertex v0 = new Vertex(byteBuffer.getFloat(), byteBuffer.getFloat(), byteBuffer.getFloat());
+        Vertex v1 = new Vertex(byteBuffer.getFloat(), byteBuffer.getFloat(), byteBuffer.getFloat());
+        Vertex v2 = new Vertex(byteBuffer.getFloat(), byteBuffer.getFloat(), byteBuffer.getFloat());
+
+        // Attribute überspringen
+        byteBuffer.getShort();
+
+        return new Face(new Triangle(v0, v1, v2), normal);
     }
 }

@@ -3,7 +3,6 @@ package de.tharms.guiprog_ea_3.utility;
 /**
  * Diese Klasse stellt eine Stoppuhr zur Verfügung, um die Bearbeitungszeit von Prozessen zu messen.
  * Das Singleton-Designmuster gewährleistet, dass immer nur ein einziges Objekt der Klasse erzeugt wird.
- * @author Thilo Harms
  */
 public class Stopwatch
 {
@@ -16,8 +15,8 @@ public class Stopwatch
 
     /**
      * Diese Methode liefert die einzige Instanz der Stopwatch-Klasse.
-     * @precondition Die Klasse darf keine bestehende Instanz von {@code Stopwatch} haben, um eine neue zu erstellen.
-     * @postcondition Eine Singleton-Instanz der Klasse {@code Stopwatch} wird zurückgegeben.
+     * @Vorbedingung  Die Klasse darf keine bestehende Instanz von {@code Stopwatch} haben, um eine neue zu erstellen.
+     * @Nachbedingung  Eine Singleton-Instanz der Klasse {@code Stopwatch} wird zurückgegeben.
      * Falls bereits eine Instanz existiert, wird diese zurückgegeben.
      * Falls noch keine Instanz existiert, wird eine neue Instanz erstellt.
      * @return Die Singleton-Instanz der Stopwatch.
@@ -37,8 +36,8 @@ public class Stopwatch
 
     /**
      * Diese Methode initialisiert die Startzeit der Stoppuhr, indem sie die aktuelle Systemzeit in Millisekunden erfasst.
-     * @precondition keine
-     * @postcondition "startTime" bekommt die aktuelle Systemzeit zugewiesen.
+     * @Vorbedingung  keine
+     * @Nachbedingung  "startTime" bekommt die aktuelle Systemzeit zugewiesen.
      */
     public void start()
     {
@@ -48,8 +47,8 @@ public class Stopwatch
 
     /**
      * Diese Methode dient zur Berechnung der seit dem Start der Stoppuhr vergangenen Zeit.
-     * @precondition Die Stoppuhr wurde mit der Methode {@link #start()} gestartet.
-     * @postcondition Die seit Start der Stoppuhr vergangene Zeit wird in Millisekunden zurückgegeben.
+     * @Vorbedingung  Die Stoppuhr wurde mit der Methode {@link #start()} gestartet.
+     * @Nachbedingung  Die seit Start der Stoppuhr vergangene Zeit wird in Millisekunden zurückgegeben.
      * @return Die vergangene Zeit in Millisekunden seit dem Start der Stoppuhr.
      */
     public long stop()

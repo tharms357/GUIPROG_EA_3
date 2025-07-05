@@ -19,27 +19,13 @@ public class Vector3D
      * @Vorbedingung Keine
      * @Nachbedingung Ein neuer {@link Vector3D} mit den übergebenen Koordinaten wurde erzeugt.
      */
-    public Vector3D(float x, float y, float z) {
+    public Vector3D(float x, float y, float z)
+    {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-
-    /**
-     * Berechnet einen Richtungsvektor vom Punkt {@code vertex1} zum Punkt {@code vertex2}.
-     *
-     * @param vertex1 Der Startpunkt des Vektors.
-     * @param vertex2 Der Endpunkt des Vektors.
-     * @return Der resultierende Richtungsvektor von {@code vertex1} nach {@code vertex2}.
-     *
-     * @Vorbedingung vertex1 und vertex2 sind nicht null
-     * @Nachbedingung Gibt den Vektor als neues {@link Vector3D}-Objekt zurück.
-     */
-    public static Vector3D getVectorFromTo(Vertex vertex1, Vertex vertex2)
-    {
-        return new Vector3D(vertex2.x - vertex1.x, vertex2.y - vertex1.y, vertex2.z - vertex1.z);
-    }
 
     /**
      * Berechnet die Länge des Vektors.
@@ -97,9 +83,11 @@ public class Vector3D
      * @Nachbedingung Gibt einen formatierten String mit den Werten zurück.
      */
     @Override
-    public String toString() {
+    public String toString()
+    {
         return Constants.OUTPUT_NORMAL + Constants.OUTPUT_SEPARATOR + x + Constants.OUTPUT_SEPARATOR + y + Constants.OUTPUT_SEPARATOR + z;
     }
+
     public float getX() {
         return x;
     }
@@ -124,6 +112,4 @@ public class Vector3D
     public void setZ(float z) {
         this.z = z;
     }
-
-
 }

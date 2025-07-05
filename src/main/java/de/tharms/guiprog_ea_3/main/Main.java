@@ -2,12 +2,20 @@ package de.tharms.guiprog_ea_3.main;
 
 import de.tharms.guiprog_ea_3.controller.ArgumentController;
 import de.tharms.guiprog_ea_3.controller.PolyhedronController;
-import de.tharms.guiprog_ea_3.model.Face;
 import de.tharms.guiprog_ea_3.model.Polyhedron;
-import de.tharms.guiprog_ea_3.model.Vertex;
-import de.tharms.guiprog_ea_3.utility.STLReader;
+import de.tharms.guiprog_ea_3.network.Server;
+import de.tharms.guiprog_ea_3.network.ServerClient;
 import de.tharms.guiprog_ea_3.view.Output;
+import de.tharms.guiprog_ea_3.view.ViewerController;
+import javafx.application.Application;
+import javafx.stage.Stage;
 
+import java.io.IOException;
+
+/**
+ * Startklasse des STL-Viewers. Liest eine STL-Datei, berechnet Oberfläche und Volumen
+ * eines Polyeders und gibt diese Informationen aus.
+ */
 public class Main
 {
     /**
@@ -21,18 +29,20 @@ public class Main
      */
     public static void main(String[] args)
     {
+        Output.greetUser();
+
         ArgumentController argsController = new ArgumentController(args);
 
-        Polyhedron polyhedron = STLReader.createPolyhedronFromSTL(argsController.getFilepath());
+        Polyhedron polyhedron = PolyhedronController.createPolyhedronFromSTL(argsController.getFilepath());
 
-        PolyhedronController.calculateAreaUsingThreads(polyhedron);
+        //Application.launch(ViewerController.class, args);
 
-        Output.printSurfaceArea(PolyhedronController.calculateSurfaceArea(polyhedron));
+        //Output.printSurfaceArea(polyhedron.getSurfaceArea());
+        //Output.printVolume(polyhedron.getVolume());
 
-        Output.partiallyPrintSortedList(PolyhedronController.sortFacesBySize(polyhedron));
+        //PolyhedronController.calculateSurfaceAreaUsingThreads(polyhedron);
+        //PolyhedronController.calculateSurfaceAreaUsingThreads2(polyhedron);
 
-        Output.printVolume(PolyhedronController.calculateVolume(polyhedron));
-
-        PolyhedronController.isConvex(polyhedron);
+        //Output.partiallyPrintSortedList(PolyhedronController.sortFacesBySize(polyhedron));
     }
 }
