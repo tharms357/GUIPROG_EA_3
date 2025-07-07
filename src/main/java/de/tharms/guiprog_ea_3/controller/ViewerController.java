@@ -1,9 +1,5 @@
-package de.tharms.guiprog_ea_3.view;
+package de.tharms.guiprog_ea_3.controller;
 
-import de.tharms.guiprog_ea_3.controller.CameraController;
-import de.tharms.guiprog_ea_3.controller.ModelController;
-import de.tharms.guiprog_ea_3.controller.PolyhedronController;
-import de.tharms.guiprog_ea_3.controller.InteractionController;
 import de.tharms.guiprog_ea_3.model.Constants;
 import de.tharms.guiprog_ea_3.network.Server;
 import javafx.application.Application;
@@ -21,11 +17,6 @@ import javafx.stage.Stage;
  */
 public class ViewerController extends Application
 {
-    //private final Rotate cameraRotateX = new Rotate(0, Rotate.X_AXIS);
-    //private final Rotate cameraRotateY = new Rotate(0, Rotate.Y_AXIS);
-
-    public final Group axesGroup = new Group();
-
     private Stage primaryStage;
 
     private InteractionController interactionController;
@@ -33,18 +24,8 @@ public class ViewerController extends Application
     private ModelController modelController;
     private PolyhedronController polyhedronController;
 
-    private Server server;
 
-    public void startServer()
-    {
-        server = new Server(10002, this);
-        server.start();
-    }
 
-    public void closeServer()
-    {
-        server.close();
-    }
 
     /**
      * Startmethode der JavaFX-Anwendung. Setzt die primaryStage und zeigt die Hauptszene an.
@@ -61,7 +42,12 @@ public class ViewerController extends Application
         Scene scene = buildMainScene();
         primaryStage.setScene(scene);
         setProgramTitle(Constants.EMPTY_STRING);
-        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream(Constants.STL_VIEWER_ICON_FILEPATH)));
+
+        primaryStage.setMinWidth(Constants.STL_VIEWER_WINDOW_MIN_WIDTH);
+        primaryStage.setMinHeight(Constants.STL_VIEWER_WINDOW_MIN_HEIGHT);
+
+        primaryStage.getIcons().add(new Image(
+                getClass().getResourceAsStream(Constants.STL_VIEWER_ICON_FILEPATH)));
         primaryStage.show();
 
         startServer();
@@ -79,6 +65,14 @@ public class ViewerController extends Application
         launch(args);
     }
 
+
+    public void startServer()
+    {
+        Server server = new Server(Constants.TCP_PORT, this);
+        server.setDaemon(true);
+        server.start();
+    }
+
     /**
      * Setzt den Programmtitel in der Titelleiste, optional mit Polyedername.
      *
@@ -93,10 +87,10 @@ public class ViewerController extends Application
             primaryStage.setTitle(
                     Constants.DEFAULT_PROGRAM_TITLE + Constants.SEPERATOR + polyhedronName);
         }
-       else
-       {
-           primaryStage.setTitle(Constants.DEFAULT_PROGRAM_TITLE);
-       }
+        else
+        {
+            primaryStage.setTitle(Constants.DEFAULT_PROGRAM_TITLE);
+        }
     }
 
     /**
@@ -127,6 +121,7 @@ public class ViewerController extends Application
         root.setCenter(centerStack);
 
         Scene scene = new Scene(root, Constants.STL_VIEWER_WINDOW_WIDTH, Constants.STL_VIEWER_WINDOW_HEIGHT);
+
         subScene.widthProperty().bind(centerStack.widthProperty());
         subScene.heightProperty().bind(centerStack.heightProperty());
 
@@ -142,17 +137,15 @@ public class ViewerController extends Application
      */
     private SubScene create3DSubScene()
     {
-        Group sceneRoot = new Group();
-        Group cameraRoot = new Group();
-        //sceneRoot.getTransforms().addAll(cameraRotateY, cameraRotateX);
+        Group group3d = new Group();
 
         modelController = new ModelController();
-        //cameraController = new CameraController(sceneRoot, cameraRotateY, cameraRotateX);
         cameraController = new CameraController();
 
-        sceneRoot.getChildren().addAll(modelController.getModelGroup(), interactionController.createCoordinateAxes(), cameraController.getCameraGroup());
+        group3d.getChildren().addAll(modelController.getModelGroup(), interactionController.createCoordinateAxes(),
+                cameraController.getCameraGroup());
 
-        SubScene subScene = new SubScene(sceneRoot, Constants.STL_VIEWER_SUBSCENE_WIDTH,
+        SubScene subScene = new SubScene(group3d, Constants.STL_VIEWER_SUBSCENE_WIDTH,
                 Constants.STL_VIEWER_SUBSCENE_HEIGHT, true, SceneAntialiasing.BALANCED);
         subScene.setFill(Color.LIGHTGRAY);
         subScene.setCamera(cameraController.getCamera());
@@ -161,22 +154,6 @@ public class ViewerController extends Application
 
         return subScene;
     }
-
-    /**
-     * Aktualisiert die Sichtbarkeit des Koordinatensystems basierend auf der Checkbox.
-     *
-     * @Vorbedingung uiController ist initialisiert.
-     * @Nachbedingung axesGroup ist sichtbar oder unsichtbar gemäß Auswahl.
-     */
-    public void updateShowAxis()
-    {
-        axesGroup.setVisible(interactionController.getShowAxis().isSelected());
-        if (interactionController.getShowAxis() != null)
-        {
-            axesGroup.setVisible(interactionController.getShowAxis().isSelected());
-        }
-    }
-
 
 
     /**
@@ -194,7 +171,7 @@ public class ViewerController extends Application
 
         modelController.setMesh(mesh);
         interactionController.updateDrawMode(mesh);
-        interactionController.refreshPolyhedronDetails(modelController.getPolyhedron());
+        interactionController.updatePolyhedronDetails(modelController.getPolyhedron());
         setProgramTitle(modelController.getPolyhedron().getName());
     }
 

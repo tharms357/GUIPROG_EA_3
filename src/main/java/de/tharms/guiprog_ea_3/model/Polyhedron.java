@@ -1,6 +1,7 @@
 package de.tharms.guiprog_ea_3.model;
 
 import de.tharms.guiprog_ea_3.controller.PolyhedronController;
+import de.tharms.guiprog_ea_3.utility.Mathmatics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,10 @@ public class Polyhedron
     public Polyhedron(List<Face> faces, String name)
     {
         this.faces = faces;
-        this.surfaceArea = PolyhedronController.calculateSurfaceArea(this);
-        this.volume = PolyhedronController.calculateVolume(this);
+        this.surfaceArea = Mathmatics.roundValue(PolyhedronController.calculateSurfaceArea(this),
+                Constants.ROUND_VALUE_PLACES);
+        this.volume = Mathmatics.roundValue(PolyhedronController.calculateVolume(this),
+                Constants.ROUND_VALUE_PLACES);
         this.name = name;
     }
 

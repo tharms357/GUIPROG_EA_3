@@ -2,6 +2,7 @@ package de.tharms.guiprog_ea_3.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Edge
 {
@@ -51,7 +52,7 @@ public class Edge
     /**
      * Vergleicht diese Kante mit einem anderen Objekt auf Gleichheit.
      *
-     * @param obj Das zu vergleichende Objekt.
+     * @param object Das zu vergleichende Objekt.
      * @return {@code true}, wenn beide Kanten dieselben start und end (unabhängig von der Reihenfolge),
      * sonst {@code false}.
      *
@@ -59,14 +60,19 @@ public class Edge
      * @Nachbedingung Gibt {@code true} zurück, wenn beide Kanten dieselben Vertex-Endpunkte besitzen.
      */
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(Object object)
     {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Edge other = (Edge) obj;
+        if (!(object instanceof Edge))
+        {
+            return false;
+        }
 
-        return (start.equals(other.start) && end.equals(other.end)) ||
-                (start.equals(other.end) && end.equals(other.start));
+        Edge other = (Edge) object;
+
+        return (this.start.equals(other.getStart())) &&
+                (this.end.equals(other.getEnd())) ||
+                (this.start.equals(other.getEnd())) &&
+                (this.end.equals(other.getStart()));
     }
 
 
@@ -81,6 +87,6 @@ public class Edge
     @Override
     public int hashCode()
     {
-        return start.hashCode() + end.hashCode();
+        return this.start.hashCode() + this.end.hashCode();
     }
 }

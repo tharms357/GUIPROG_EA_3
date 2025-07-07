@@ -1,6 +1,7 @@
 package de.tharms.guiprog_ea_3.model;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -81,5 +82,36 @@ public class Polygon
         }
 
         return vertices;
+    }
+
+    public LinkedHashSet<Edge> getUniqueEdges()
+    {
+        List<Edge> edges = getEdges();
+
+        LinkedHashSet<Edge> uniqueEdges = new LinkedHashSet<>();
+        uniqueEdges.addAll(edges);
+
+        return uniqueEdges;
+    }
+
+    /**
+     * Ermittelt alle einzigartigen {@link Vertex}-Objekte, die in der Fläche verwendet werden.
+     * Es doppeln sich keine Objekte mit gleichen Werten.
+     *
+     * @return Eine Liste einzigartiger {@link Vertex}-Objekte.
+     * @Vorbedingung Das Polygon ist gültig und enthält Edges und Vertices.
+     * @Nachbedingung Gibt eine Liste mit einzigartigen {@link Vertex}-Objekten der Fläche zurück.
+     */
+    public LinkedHashSet<Vertex> getUniqueVertices()
+    {
+        LinkedHashSet<Vertex> uniqueVertices = new LinkedHashSet<>();
+
+        for (Edge edge : this.getEdges())
+        {
+            uniqueVertices.add(edge.getStart());
+            uniqueVertices.add(edge.getEnd());
+        }
+
+        return uniqueVertices;
     }
 }

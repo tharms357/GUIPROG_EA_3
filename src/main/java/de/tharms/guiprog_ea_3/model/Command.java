@@ -4,9 +4,9 @@ public class Command
 {
     public ServerCommands action;
     public Axis axis;
-    public float value;
+    public double value;
 
-    public Command(ServerCommands action, Axis axis, float value)
+    public Command(ServerCommands action, Axis axis, double value)
     {
         this.action = action;
         this.axis = axis;

@@ -65,16 +65,16 @@ public class Vertex
     @Override
     public boolean equals(Object object)
     {
-        if (this == object)
+        if (! (object instanceof Vertex))
         {
-            return true;
+            return false;
         }
 
         Vertex other = (Vertex) object;
 
-        return Double.compare(x, other.x) == 0 &&
-                Double.compare(y, other.y) == 0 &&
-                Double.compare(z, other.z) == 0;
+        return this.x == other.getX() &&
+                this.y == other.getY() &&
+                this.z == other.getZ();
     }
 
     /**

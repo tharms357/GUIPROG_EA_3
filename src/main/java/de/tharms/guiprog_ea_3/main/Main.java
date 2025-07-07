@@ -3,14 +3,9 @@ package de.tharms.guiprog_ea_3.main;
 import de.tharms.guiprog_ea_3.controller.ArgumentController;
 import de.tharms.guiprog_ea_3.controller.PolyhedronController;
 import de.tharms.guiprog_ea_3.model.Polyhedron;
-import de.tharms.guiprog_ea_3.network.Server;
-import de.tharms.guiprog_ea_3.network.ServerClient;
 import de.tharms.guiprog_ea_3.view.Output;
-import de.tharms.guiprog_ea_3.view.ViewerController;
+import de.tharms.guiprog_ea_3.controller.ViewerController;
 import javafx.application.Application;
-import javafx.stage.Stage;
-
-import java.io.IOException;
 
 /**
  * Startklasse des STL-Viewers. Liest eine STL-Datei, berechnet Oberfläche und Volumen
@@ -35,14 +30,16 @@ public class Main
 
         Polyhedron polyhedron = PolyhedronController.createPolyhedronFromSTL(argsController.getFilepath());
 
-        //Application.launch(ViewerController.class, args);
+        Output.printSurfaceArea(polyhedron.getSurfaceArea());
 
-        //Output.printSurfaceArea(polyhedron.getSurfaceArea());
-        //Output.printVolume(polyhedron.getVolume());
+        Output.printVolume(polyhedron.getVolume());
+
+        Output.partiallyPrintSortedList(PolyhedronController.sortFacesBySize(polyhedron));
+
+        Application.launch(ViewerController.class, argsController.getFilepath());
+
 
         //PolyhedronController.calculateSurfaceAreaUsingThreads(polyhedron);
         //PolyhedronController.calculateSurfaceAreaUsingThreads2(polyhedron);
-
-        //Output.partiallyPrintSortedList(PolyhedronController.sortFacesBySize(polyhedron));
     }
 }

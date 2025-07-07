@@ -1,5 +1,6 @@
 package de.tharms.guiprog_ea_3.model;
 
+import de.tharms.guiprog_ea_3.view.ColorCodes;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
@@ -22,7 +23,7 @@ public interface Constants
     int STL_VERTEX_NUMBER_OF_DIMENSIONS = 3;
     int ERROR_CODE_EXIT = 1;
     int TETRAHEDRON_VOLUME_FACTOR = 6;
-    int EULER_CHARACTERISTIC_CONVEX_POLYHEDRON = 2;
+    int EULER_CHARACTERISTIC_CLOSED_POLYHEDRON = 2;
     int SQUARED = 2;
 
     String OUTPUT_READING_FILE_START_INFO = "Folgende Datei wird eingelesen...";
@@ -80,7 +81,7 @@ public interface Constants
     double CAMERA_DEFAULT_X_ANGLE = 235;
     double CAMERA_DEFAULT_Y_ANGLE = 0;
     double TRANSLATE_DEFAULT_Z = -200;
-    double CAMERA_DEFAULT_Z = 2000;
+    double CAMERA_DEFAULT_Z = -400;
     double CAMERA_NEAR_CLIP = 0.1;
     double CAMERA_FAR_CLIP = 10000;
     String INVALID_STL_FILE = "Ungültige .stl-Datei";
@@ -97,7 +98,7 @@ public interface Constants
     String SIDEBAR_VBOX_STYLE = "-fx-background-color: rgba(255,255,255,0.95); -fx-padding: 20; -fx-min-width: 250;";
     String MENU_FILE = "Datei";
     String MENU_QUIT_PROGRAM = "Beenden";
-    String MENU_OPEN_STL_FILE = ".stl-Datei öffnen";
+    String MENU_OPEN_STL_FILE = "STL-Datei öffnen";
     String MENU_SELECT_STL_FILE = "STL-Datei auswählen";
     String MENU_LOAD_EXAMPLE_STL_FILE = "Beispiel STL-Datei laden";
     String MENU_VIEW = "Ansicht";
@@ -139,20 +140,44 @@ public interface Constants
     String BINARY_STL_FILE_FORMAT = "Binary-Format";
     String SOCKET_CREATION_FAILURE = "Fehler beim Erstellen des Sockets: ";
     String INVALID_FLOAT_VALUE = "Fehlerhafter Wert angegeben: ";
-    int TCP_PORT = 10002;
+    int TCP_PORT = 1234;
     String TCP_HOSTNAME = "localhost";
     String CLIENT_CONSOLE_INFO = "Befehl oder exit eingeben";
     String COMMAND_EXIT = "exit";
     String CLIENT_INPUT_MESSAGE_SPLIT_REGEX = "\\s+";
     String INVALID_COMMAND = "Der eingegebene Befehl ist ungültig";
-    String SERVER_CLOSED = "Server closed";
+    String CONNECTION_CLOSED = "Verbindung wird geschlossen";
     String SERVER_RESPONSE_MESSAGE = "Antwort des Servers: ";
     String SERVER_RUNNING_MESSAGE = "Server läuft auf Port ";
     String SERVER_CONNECTION_FROM = "Verbindung von ";
-    String COMMAND_EXECUTED = "Befehl wurde ausgeführt.";
+    String COMMAND_EXECUTED = "Befehl wurde ausgeführt";
     String COMMAND_ROTATE = "ROTATE";
     String COMMAND_TRANSLATE = "TRANSLATE";
     double X_DEFAULT_TRANSLATION_FACTOR = 0.1;
     double Y_DEFAULT_TRANSLATION_FACTOR = 0.1;
     double CAMERA_DEFAULT_Y = 50;
+    String CLIENT_START_INFO = "Client gestartet:\nVerbunden mit Server " + ColorCodes.BLUE
+            + "%s:%s" + ColorCodes.RESET;
+    String COMMAND_SYNTAX = "Befehlssyntax: " + ColorCodes.PURPLE +
+            "\n[Aktion (translate; rotate)]\n[Achse (X; Y; Z)]\n[Wert (Zahl)]" + ColorCodes.RESET;
+    int STL_VIEWER_WINDOW_MIN_WIDTH = 900;
+    int STL_VIEWER_WINDOW_MIN_HEIGHT = 700;
+    String PROGRAM_INSTRUCTIONS = "Kurzanleitung";
+    String STL_VIEWER_INSTRUCTIONS = "Kurzanleitung für den STL-Viewer";
+    String POLYEDER_EULER_INFORMATION = "Die Euler-Charakteristik des Polyeders beträgt " + ColorCodes.GREEN + "%s"
+            + ColorCodes.RESET + ", womit es sich um einen %s Polyeder handelt.";
+    String POLYEDER_EULER_CLOSED = "geschlossenen";
+    String POLYEDER_EULER_OPEN = "offenen";
+    String EXCEPTION_ROUND_PLACES_LOWER_THAN_ZERO = "Der gerundete Wert darf nicht kleiner als Null sein";
+    int ROUND_VALUE_PLACES = 3;
+    String PROGRAM_INSTRUCTIONS_TEXT = "1. Über das Menü 'Datei' lässt sich eine STL-Datei öffnen: " +
+            "'STL-Datei öffnen' lädt eigene Dateien, 'Beispiel STL-Datei laden' zeigt ein Beispielmodell an.\n" +
+            "2. Modell und Koordinatensystem lassen sich mit der Maus steuern:\n" +
+            " - Linksklick dreht das Modell\n" +
+            " - Rechtsklick verschiebt das Modell\n" +
+            " - Scrollrad zoomt heran und heraus\n" +
+            " - Shift + Linksklick bewegt die Kamera im Raum\n" +
+            "3. Die Ansicht lässt sich in der Seitenleiste nach Bedarf anpassen.\n" +
+            "4. Unter 'Polyeder-Informationen' in der Seitenleiste erscheinen Details zum aktuell geladenen Modell.\n" +
+            "5. Im Menü 'Ansicht' lässt sich das Koordinatensystem oder die Modellposition jederzeit zurücksetzen.\n";
 }

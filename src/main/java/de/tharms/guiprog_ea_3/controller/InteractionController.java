@@ -3,7 +3,6 @@ package de.tharms.guiprog_ea_3.controller;
 import de.tharms.guiprog_ea_3.model.Axis;
 import de.tharms.guiprog_ea_3.model.Constants;
 import de.tharms.guiprog_ea_3.model.Polyhedron;
-import de.tharms.guiprog_ea_3.view.ViewerController;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -20,7 +19,6 @@ import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.MeshView;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -36,16 +34,15 @@ public class InteractionController
     private double objectAngleX, objectAngleY, objectAngleZ;
     private double objectTranslateX, objectTranslateY;
 
-    private final Rotate modelRotateX = new Rotate(0, Rotate.X_AXIS);
-    private final Rotate modelRotateY = new Rotate(0, Rotate.Y_AXIS);
-    private final Rotate modelRotateZ = new Rotate(0, Rotate.Z_AXIS);
+    private Group axesGroup = new Group();
 
     private CheckBox showWireframe;
     private CheckBox showAxis;
 
     private VBox polyhedronDetails;
 
-    public void addMouseControl(SubScene subScene, ModelController modelController, CameraController cameraController)
+    public void addMouseControl(SubScene subScene, ModelController modelController,
+                                CameraController cameraController)
     {
         subScene.setOnMousePressed(mouseEvent -> mouseIsPressed(
                 mouseEvent, modelController, cameraController));
@@ -55,13 +52,13 @@ public class InteractionController
                 scrollEvent, cameraController));
     }
 
-    private void mouseIsPressed(
-            MouseEvent mouseEvent, ModelController modelController, CameraController cameraController)
+    private void mouseIsPressed(MouseEvent mouseEvent, ModelController modelController,
+                                CameraController cameraController)
     {
         anchorX = mouseEvent.getSceneX();
         anchorY = mouseEvent.getSceneY();
         cameraAngleX =  cameraController.getCameraRotateX().getAngle();
-        cameraAngleZ = cameraController.getCameraRotateZ().getAngle();
+        cameraAngleZ = cameraController.getCameraRotateY().getAngle();
         objectAngleX = modelController.getRotateX().getAngle();
         objectAngleY = modelController.getRotateY().getAngle();
         objectAngleZ = modelController.getRotateZ().getAngle();
@@ -69,28 +66,32 @@ public class InteractionController
         objectTranslateY = modelController.getTranslate().getY();
     }
 
-    private void mouseIsDragged(MouseEvent mouseEvent, ModelController modelController, CameraController cameraController)
+    private void mouseIsDragged(MouseEvent mouseEvent, ModelController modelController,
+                                CameraController cameraController)
     {
+        double deltaX = mouseEvent.getSceneX() - anchorX;
+        double deltaY = mouseEvent.getSceneY() - anchorY;
+
         if (mouseEvent.isPrimaryButtonDown() && mouseEvent.isShiftDown())
         {
-            double deltaX = mouseEvent.getSceneX() - anchorX;
-            double deltaY = mouseEvent.getSceneY() - anchorY;
-            cameraController.rotateCamera(Axis.X, -deltaY / 10, cameraAngleX);
-            cameraController.rotateCamera(Axis.Z, deltaX / 10, cameraAngleZ);
+            cameraController.rotateCamera(Axis.X,
+                    -deltaY * Constants.X_DEFAULT_ROTATION_FACTOR, cameraAngleX);
+            cameraController.rotateCamera(Axis.Z,
+                    deltaX * Constants.Z_DEFAULT_ROTATION_FACTOR, cameraAngleZ);
         }
         else if (mouseEvent.isSecondaryButtonDown())
         {
-            double deltaX = mouseEvent.getSceneX() - anchorX;
-            double deltaY = mouseEvent.getSceneY() - anchorY;
-            modelController.translateObject(Axis.X, deltaX * Constants.X_DEFAULT_TRANSLATION_FACTOR, objectTranslateX);
-            modelController.translateObject(Axis.Y, -deltaY * Constants.Y_DEFAULT_TRANSLATION_FACTOR, objectTranslateY);
+            modelController.translateObject(Axis.X,
+                    deltaX * Constants.X_DEFAULT_TRANSLATION_FACTOR, objectTranslateX);
+            modelController.translateObject(Axis.Y,
+                    -deltaY * Constants.Y_DEFAULT_TRANSLATION_FACTOR, objectTranslateY);
         }
         else if (mouseEvent.isPrimaryButtonDown())
         {
-            double deltaX = mouseEvent.getSceneX() - anchorX;
-            double deltaY = mouseEvent.getSceneY() - anchorY;
-            modelController.rotateObject(Axis.X, deltaY * Constants.X_DEFAULT_ROTATION_FACTOR, objectAngleX);
-            modelController.rotateObject(Axis.Z, deltaX * Constants.Y_DEFAULT_ROTATION_FACTOR, objectAngleZ);
+            modelController.rotateObject(Axis.X,
+                    deltaY * Constants.X_DEFAULT_ROTATION_FACTOR, objectAngleX);
+            modelController.rotateObject(Axis.Z,
+                    deltaX * Constants.Y_DEFAULT_ROTATION_FACTOR, objectAngleZ);
         }
     }
 
@@ -133,22 +134,33 @@ public class InteractionController
     public VBox createSidebar(ViewerController viewerController)
     {
         polyhedronDetails = createDefaultPolyhedronDetails();
-
-        showWireframe = new CheckBox(Constants.CHECKBOX_SHOW_WIREFRAME_ONLY);
-        showWireframe.setOnAction(actionEvent -> {
-            updateDrawMode(viewerController.getModelController().getMeshView());
-        });
-
-        showAxis = new CheckBox(Constants.CHECKBOX_SHOW_COORDINATE_SYSTEM);
-        showAxis.setSelected(true);
-        showAxis.setOnAction(actionEvent -> {
-            viewerController.updateShowAxis();
-        });
+        showWireframe = createShowWireframeCheckBox(viewerController);
+        showAxis = createShowAxisCheckBox();
 
         VBox sidebar = new VBox(Constants.SIDEBAR_VBOX_SIZE, polyhedronDetails, showAxis, showWireframe);
         sidebar.setStyle(Constants.SIDEBAR_VBOX_STYLE);
         return sidebar;
     }
+
+    private CheckBox createShowWireframeCheckBox(ViewerController viewerController)
+    {
+        CheckBox showWireframe = new CheckBox(Constants.CHECKBOX_SHOW_WIREFRAME_ONLY);
+        showWireframe.setOnAction(actionEvent -> {
+            updateDrawMode(viewerController.getModelController().getMeshView());
+        });
+        return showWireframe;
+    }
+
+    private CheckBox createShowAxisCheckBox()
+    {
+        CheckBox showAxis = new CheckBox(Constants.CHECKBOX_SHOW_COORDINATE_SYSTEM);
+        showAxis.setSelected(true);
+        showAxis.setOnAction(actionEvent -> {
+            updateShowAxis();
+        });
+        return showAxis;
+    }
+
 
     /**
      * Erstellt das Datei-Menü mit Optionen zum Laden einer Beispiel-STL, Öffnen einer beliebigen Datei
@@ -168,7 +180,6 @@ public class InteractionController
         MenuItem quitProgram = new MenuItem(Constants.MENU_QUIT_PROGRAM);
         quitProgram.setOnAction(actionEvent -> {
             System.exit(0);
-            //TODO hier server closen
         });
 
 
@@ -272,7 +283,7 @@ public class InteractionController
 
             showAxis.setSelected(true);
             showAxis.setVisible(true);
-            viewerController.updateShowAxis();
+            updateShowAxis();
         });
 
         view.getItems().addAll(resetModel, resetView);
@@ -288,8 +299,42 @@ public class InteractionController
      */
     public Menu createHelpMenu()
     {
-        Menu help = new Menu(Constants.MENU_HELP);
+        Menu helpMenu = new Menu(Constants.MENU_HELP);
 
+        MenuItem about = createInfoMenuItem();
+        MenuItem instructions = createInstructionMenuItem();
+
+        helpMenu.getItems().addAll(about, instructions);
+
+        return helpMenu;
+    }
+
+    private MenuItem createInstructionMenuItem()
+    {
+        MenuItem instructions = new MenuItem(Constants.PROGRAM_INSTRUCTIONS);
+
+        instructions.setOnAction(actionEvent -> {
+            Dialog<Void> dialog = new Dialog<>();
+            dialog.setTitle(Constants.PROGRAM_INSTRUCTIONS);
+            dialog.setHeaderText(Constants.STL_VIEWER_INSTRUCTIONS);
+
+            dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+
+            TextArea content = new TextArea(Constants.PROGRAM_INSTRUCTIONS_TEXT);
+            content.setEditable(false);
+            content.setWrapText(true);
+            content.setPrefWidth(450);
+            content.setPrefHeight(230);
+
+            dialog.getDialogPane().setContent(content);
+            dialog.showAndWait();
+        });
+
+        return instructions;
+    }
+
+    public MenuItem createInfoMenuItem()
+    {
         MenuItem about = new MenuItem(Constants.MENU_ABOUT_STL_VIEWER);
         about.setOnAction(actionEvent -> {
             Alert info = new Alert(Alert.AlertType.INFORMATION);
@@ -299,9 +344,7 @@ public class InteractionController
             info.showAndWait();
         });
 
-        help.getItems().addAll(about);
-
-        return help;
+        return about;
     }
 
     /**
@@ -333,7 +376,7 @@ public class InteractionController
      * @Vorbedingung polyhedron darf nicht null sein.
      * @Nachbedingung Die polyhedronDetails VBox enthält aktuelle Informationen.
      */
-    public void refreshPolyhedronDetails(Polyhedron polyhedron)
+    public void updatePolyhedronDetails(Polyhedron polyhedron)
     {
         Label title = new Label(Constants.SIDEBAR_POLYHEDRON_INFORMATION);
         title.setStyle(Constants.SIDEBAR_POLYHEDRON_INFORMATION_STYLE);
@@ -349,6 +392,20 @@ public class InteractionController
                         Constants.SIDEBAR_SURFACE_AREA, polyhedron.getSurfaceArea() + Constants.UNITS_CM_2),
                 createTextField(
                         Constants.SIDEBAR_VOLUME, polyhedron.getVolume() + Constants.UNITS_CM_3));
+    }
+
+    /**
+     * Aktualisiert die Sichtbarkeit des Koordinatensystems basierend auf der Checkbox.
+     *
+     * @Vorbedingung uiController ist initialisiert.
+     * @Nachbedingung axesGroup ist sichtbar oder unsichtbar gemäß Auswahl.
+     */
+    public void updateShowAxis()
+    {
+        if (showAxis != null)
+        {
+            axesGroup.setVisible(showAxis.isSelected());
+        }
     }
 
     /**
@@ -396,7 +453,9 @@ public class InteractionController
 
         Group grid = createGrid(Constants.GRID_SIZE, Constants.GRID_STEP);
 
-        return new Group(xAxis, yAxis, zAxis, grid);
+        axesGroup = new Group(xAxis, yAxis, zAxis, grid);
+
+        return axesGroup;
     }
 
     /**
@@ -434,11 +493,13 @@ public class InteractionController
         return gridGroup;
     }
 
-    public CheckBox getShowWireframe() {
+    public CheckBox getShowWireframe()
+    {
         return showWireframe;
     }
 
-    public CheckBox getShowAxis() {
+    public CheckBox getShowAxis()
+    {
         return showAxis;
     }
 }

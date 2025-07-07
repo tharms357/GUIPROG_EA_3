@@ -1,7 +1,6 @@
 package de.tharms.guiprog_ea_3.controller;
 
 import de.tharms.guiprog_ea_3.model.*;
-import de.tharms.guiprog_ea_3.utility.FileReader;
 import de.tharms.guiprog_ea_3.utility.Mathmatics;
 import de.tharms.guiprog_ea_3.utility.STLReader;
 import de.tharms.guiprog_ea_3.utility.Stopwatch;
@@ -57,6 +56,8 @@ public class PolyhedronController
         //TODO Einlesen in extra methode für FileReader auslagern?
         Output.printFileReadingStart(filepath);
 
+        Polyhedron polyhedron;
+
         if (filepath == null || !filepath.endsWith(Constants.FILENAME_VALID_FORMAT))
         {
             throw new IllegalArgumentException(Constants.INVALID_FILE_FORMAT);
@@ -83,11 +84,11 @@ public class PolyhedronController
 
             if (isASCII)
             {
-                return STLReader.createPolyhedronFromASCIISTL(filepath);
+                polyhedron = STLReader.createPolyhedronFromASCIISTL(filepath);
             }
             else
             {
-                return STLReader.createPolyhedronFromBinarySTL(data, filepath);
+                polyhedron = STLReader.createPolyhedronFromBinarySTL(data, filepath);
             }
         }
         catch (IOException e)
@@ -95,6 +96,10 @@ public class PolyhedronController
             System.err.println(e.getMessage());
             return null;
         }
+
+        Output.printEulerCharacteristicsInformation(polyhedron, PolyhedronController.isClosed(polyhedron));
+
+        return polyhedron;
     }
 
     /**
@@ -126,20 +131,6 @@ public class PolyhedronController
         Output.timePassed(Stopwatch.getInstance().stop(), Constants.AREA_CALCULATION_PARALLEL);
 
         return surfaceArea;
-    }
-
-
-    public static double calculateSurfaceAreaUsingThreads2(Polyhedron polyhedron)
-    {
-        Stopwatch.getInstance().start();
-
-        List<Face> faces = polyhedron.getFaces();
-
-        double sum = faces.parallelStream().mapToDouble(f->f.getPolygon().calculateArea()).sum();
-
-        Output.timePassed(Stopwatch.getInstance().stop(), Constants.AREA_CALCULATION_PARALLEL);
-
-        return sum;
     }
 
     /**
@@ -192,7 +183,7 @@ public class PolyhedronController
 
         for (Face face : polyhedron.getFaces())
         {
-            List<Vertex> vertices = face.getUniqueVertices();
+            List<Vertex> vertices = new ArrayList<>(face.getPolygon().getUniqueVertices());
 
             Vector3D base = vertices.getFirst().toVector();
 
@@ -213,30 +204,23 @@ public class PolyhedronController
     }
 
     /**
-     * Prüft, ob das Polyeder konvex ist, basierend auf Euler-Charakteristik.
+     * Prüft, ob das Polyeder geschlossen ist, basierend auf Euler-Charakteristik.
      *
      * @param polyhedron Das {@link Polyhedron}-Objekt, dessen Konvexität geprüft werden soll.
      * @return true, wenn das Polyeder konvex ist, sonst false.
      * @Vorbedingung polyhedron darf nicht null sein.
      * @Nachbedingung Ein Wahrheitswert zur Konvexität wurde zurückgegeben.
      */
-    public static boolean isConvex(Polyhedron polyhedron)
+    public static int isClosed(Polyhedron polyhedron)
     {
-        HashSet<Vertex> uniqueVertices = new HashSet<>();
-        HashSet<Edge> uniqueEdges = new HashSet<>();
+        LinkedHashSet<Vertex> uniqueVertices = new LinkedHashSet<>();
+        LinkedHashSet<Edge> uniqueEdges = new LinkedHashSet<>();
 
         for (Face face : polyhedron.getFaces())
         {
-            Polygon currentPolygon = face.getPolygon();
-
-            List<Edge> edges = currentPolygon.getEdges();
-
-            for (Edge edge : edges)
-            {
-                uniqueVertices.add(edge.getStart());
-                uniqueVertices.add(edge.getEnd());
-                uniqueEdges.add(edge);
-            }
+            Polygon poly = face.getPolygon();
+            uniqueVertices.addAll(poly.getUniqueVertices());
+            uniqueEdges.addAll(poly.getUniqueEdges());
         }
 
         return Mathmatics.calculateEulerCharacteristics(

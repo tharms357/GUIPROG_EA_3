@@ -7,7 +7,7 @@ import de.tharms.guiprog_ea_3.model.Constants;
 import de.tharms.guiprog_ea_3.model.ServerCommands;
 import de.tharms.guiprog_ea_3.view.ColorCodes;
 import de.tharms.guiprog_ea_3.view.Output;
-import de.tharms.guiprog_ea_3.view.ViewerController;
+import de.tharms.guiprog_ea_3.controller.ViewerController;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -78,7 +78,7 @@ public class Server extends Thread
     {
         ServerCommands action = command.action;
         Axis axis = command.axis;
-        float value = command.value;
+        double value = command.value;
 
         switch (action)
         {
@@ -94,8 +94,12 @@ public class Server extends Thread
 
             case EXIT:
                 Output.printServerResponse(
-                        ColorCodes.RED + Constants.SERVER_CLOSED + ColorCodes.RESET);
-                close();
+                        ColorCodes.RED + Constants.CONNECTION_CLOSED + ColorCodes.RESET);
+                break;
+
+            default:
+                Output.printServerResponse(
+                        ColorCodes.RED + Constants.INVALID_COMMAND + ColorCodes.RESET);
                 break;
         }
     }
@@ -109,7 +113,7 @@ public class Server extends Thread
             try
             {
                 serverSocket.close();
-                Output.printInformation(Constants.SERVER_CLOSED);
+                Output.printInformation(Constants.CONNECTION_CLOSED);
             }
             catch (IOException ioException)
             {

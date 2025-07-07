@@ -24,7 +24,7 @@ public class ThreadController
             (Polyhedron polyhedron, int numberOfThreads, float[] threadResults)
     {
         List<Thread> threads = new ArrayList<Thread>();
-        int areasToCalculate = calculateAreasForEachThread(polyhedron.getFaces().size(), numberOfThreads);
+        int areasToCalculate = calculateThreadWorkload(polyhedron.getFaces().size(), numberOfThreads);
 
         for (int i = 0; i < numberOfThreads; i++)
         {
@@ -96,7 +96,7 @@ public class ThreadController
      * @Vorbedingung size >= 0 und numberOfThreads > 0.
      * @Nachbedingung Das Ergebnis ist mindestens 1, sofern size > 0.
      */
-    private static int calculateAreasForEachThread(int size, int numberOfThreads)
+    private static int calculateThreadWorkload(int size, int numberOfThreads)
     {
         return (int) Math.ceil((float) size / numberOfThreads);
     }

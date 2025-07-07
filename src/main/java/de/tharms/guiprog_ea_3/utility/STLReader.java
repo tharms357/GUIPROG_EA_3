@@ -1,6 +1,8 @@
 package de.tharms.guiprog_ea_3.utility;
 
+import de.tharms.guiprog_ea_3.controller.PolyhedronController;
 import de.tharms.guiprog_ea_3.model.*;
+import de.tharms.guiprog_ea_3.view.Output;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -54,9 +56,7 @@ public class STLReader
             }
         }
 
-        Polyhedron polyhedron = new Polyhedron(faces, polyhedronName);
-
-        return polyhedron;
+        return new Polyhedron(faces, polyhedronName);
     }
 
     /**
@@ -96,16 +96,16 @@ public class STLReader
 
         edges.add(
                 new Edge(
-                        vertices.get(Constants.INDEX_ONE),
-                        vertices.get(Constants.INDEX_ZERO)));
+                        vertices.get(Constants.INDEX_ZERO),
+                        vertices.get(Constants.INDEX_ONE)));
         edges.add(
                 new Edge(
-                        vertices.get(Constants.INDEX_ZERO),
+                        vertices.get(Constants.INDEX_ONE),
                         vertices.get(Constants.INDEX_TWO)));
         edges.add(
                 new Edge(
                         vertices.get(Constants.INDEX_TWO),
-                        vertices.get(Constants.INDEX_ONE)));
+                        vertices.get(Constants.INDEX_ZERO)));
 
         return edges;
     }
@@ -223,7 +223,7 @@ public class STLReader
             faces.add(createFaceFromByteBuffer(byteBuffer));
         }
 
-        return new Polyhedron(faces, polyhedronName);
+        return new Polyhedron(faces, "xyz_cube.stl");
     }
 
     private static Face createFaceFromByteBuffer(ByteBuffer byteBuffer)

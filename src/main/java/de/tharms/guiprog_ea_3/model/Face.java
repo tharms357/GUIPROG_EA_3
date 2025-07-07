@@ -1,9 +1,6 @@
 package de.tharms.guiprog_ea_3.model;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Face
 {
@@ -23,27 +20,6 @@ public class Face
         this.polygon = polygon;
         this.normal = normal;
     }
-
-    /**
-     * Ermittelt alle einzigartigen {@link Vertex}-Objekte, die in der Fläche verwendet werden.
-     * Es doppeln sich keine Objekte mit gleichen Werten.
-     *
-     * @return Eine Liste einzigartiger {@link Vertex}-Objekte.
-     * @Vorbedingung Die Fläche enthält ein gültiges Polygon mit Edges und Vertices.
-     * @Nachbedingung Gibt eine Liste mit einzigartigen {@link Vertex}-Objekten der Fläche zurück.
-     */
-    public List<Vertex> getUniqueVertices()
-    {
-        Set<Vertex> uniqueVertices = new LinkedHashSet<>();
-
-        for (Edge edge : this.getPolygon().getEdges())
-        {
-            uniqueVertices.addAll(edge.getVertices());
-        }
-
-        return new ArrayList<>(uniqueVertices);
-    }
-
 
     public Polygon getPolygon() {
         return polygon;

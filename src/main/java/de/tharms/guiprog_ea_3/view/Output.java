@@ -1,7 +1,9 @@
 package de.tharms.guiprog_ea_3.view;
 
+import de.tharms.guiprog_ea_3.controller.PolyhedronController;
 import de.tharms.guiprog_ea_3.model.Constants;
 import de.tharms.guiprog_ea_3.model.Face;
+import de.tharms.guiprog_ea_3.model.Polyhedron;
 
 import java.net.SocketAddress;
 import java.util.ArrayList;
@@ -83,7 +85,7 @@ public class Output
         System.out.println(Constants.OUTPUT_SURFACE_AREA + ColorCodes.BLUE + surfaceArea + ColorCodes.RESET);
     }
 
-    public static void printVolume(double volume)
+    public static void printVolume(float volume)
     {
         System.out.println(Constants.OUTPUT_VOLUME + ColorCodes.BLUE + volume + ColorCodes.RESET);
     }
@@ -119,6 +121,7 @@ public class Output
 
     public static void printServerRunningInfo(int port)
     {
+        System.out.println();
         System.out.println(Constants.SERVER_RUNNING_MESSAGE + ColorCodes.BLUE + port + ColorCodes.RESET);
     }
 
@@ -135,5 +138,19 @@ public class Output
     public static void printServerConnection(SocketAddress socketAddress)
     {
         System.out.println(Constants.SERVER_CONNECTION_FROM + socketAddress);
+    }
+
+    public static void printEulerCharacteristicsInformation(Polyhedron polyhedron, int eulerCharacteristicValue)
+    {
+        if (polyhedron != null && eulerCharacteristicValue == Constants.EULER_CHARACTERISTIC_CLOSED_POLYHEDRON)
+        {
+            System.out.println(String.format(Constants.POLYEDER_EULER_INFORMATION,
+                    PolyhedronController.isClosed(polyhedron), Constants.POLYEDER_EULER_CLOSED));
+        }
+        else if (polyhedron != null)
+        {
+            System.out.println(String.format(Constants.POLYEDER_EULER_INFORMATION,
+                    PolyhedronController.isClosed(polyhedron), Constants.POLYEDER_EULER_OPEN));
+        }
     }
 }

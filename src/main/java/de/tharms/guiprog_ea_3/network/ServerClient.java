@@ -5,6 +5,7 @@ import de.tharms.guiprog_ea_3.model.Axis;
 import de.tharms.guiprog_ea_3.model.Command;
 import de.tharms.guiprog_ea_3.model.Constants;
 import de.tharms.guiprog_ea_3.model.ServerCommands;
+import de.tharms.guiprog_ea_3.view.ColorCodes;
 import de.tharms.guiprog_ea_3.view.Output;
 
 
@@ -24,6 +25,9 @@ public class ServerClient
 
     public static void startClient(int port, String host)
     {
+        Output.printInformation(String.format(Constants.CLIENT_START_INFO, host, port));
+        Output.printInformation(Constants.COMMAND_SYNTAX);
+
         boolean running = true;
         Gson gson = new Gson();
 
@@ -35,18 +39,27 @@ public class ServerClient
             while (running)
             {
                 Output.printInformation(Constants.CLIENT_CONSOLE_INFO);
-
                 String inputMessage = consoleInput.nextLine().trim();
 
                 if (inputMessage.equalsIgnoreCase(Constants.COMMAND_EXIT))
                 {
+                    // Command zum Beenden des Clients, Achse und Wert sind Platzhalter
+                    Command command = new Command(ServerCommands.EXIT, Axis.X, 0);
+                    String json = gson.toJson(command);
+
+                    sendCommand(output, json);
+
+                    receiveCommand(input);
+
                     socket.close();
                     break;
                 }
 
+
                 String[] inputValues = inputMessage.split(Constants.CLIENT_INPUT_MESSAGE_SPLIT_REGEX);
-                if (inputValues.length != 3) {
-                    Output.printInformation(Constants.CLIENT_CONSOLE_INFO);
+                if (inputValues.length != 3)
+                {
+                    Output.printInformation(ColorCodes.RED + Constants.INVALID_COMMAND + ColorCodes.RESET);
                     continue;
                 }
 
@@ -56,7 +69,7 @@ public class ServerClient
                         Float.parseFloat(inputValues[Constants.INDEX_TWO]));
 
                 String json = gson.toJson(command);
-                sendCommand(socket, output, json);
+                sendCommand(output, json);
 
                 receiveCommand(input);
             }
@@ -72,7 +85,7 @@ public class ServerClient
             System.out.println("IOException" + ioException.getMessage());
         }
 
-        Output.printInformation(Constants.SERVER_CLOSED);
+        Output.printInformation(Constants.CONNECTION_CLOSED);
     }
 
     private static void receiveCommand(BufferedReader bufferedReader)
@@ -90,7 +103,7 @@ public class ServerClient
     }
 
 
-    private static void sendCommand(Socket socket, PrintWriter printWriter, String json)
+    private static void sendCommand(PrintWriter printWriter, String json)
     {
         printWriter.println(json);
     }

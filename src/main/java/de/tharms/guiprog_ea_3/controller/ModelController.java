@@ -20,12 +20,11 @@ public class ModelController
 {
     private final Group modelGroup = new Group();
     private final Group rotationGroup = new Group();
+
     private final Rotate rotateX = new Rotate(0, Rotate.X_AXIS);
     private final Rotate rotateY = new Rotate(0, Rotate.Y_AXIS);
     private final Rotate rotateZ = new Rotate(0, Rotate.Z_AXIS);
     private final Translate translate = new Translate();
-    private double anchorX, anchorY;
-    private double anchorAngleX, anchorAngleZ;
 
     private MeshView meshView;
     private Polyhedron polyhedron;
@@ -102,103 +101,6 @@ public class ModelController
         rotationGroup.getChildren().add(meshView);
     }
 
-    /**
-     * Wendet das Standardmaterial aus {@link Constants} auf das MeshView an.
-     *
-     * @param meshView Das {@link MeshView}, dem das Material zugewiesen wird.
-     * @Vorbedingung meshView darf nicht null sein.
-     * @Nachbedingung meshView hat das Default-Material gesetzt.
-     */
-    private void setMeshDefaultValues(MeshView meshView)
-    {
-        meshView.setMaterial(Constants.DEFAULT_MESHVIEW_MATERIAL);
-    }
-
-    /**
-     * Registriert Maussteuerung für Rotation und Translation des Modells in einer SubScene.
-     *
-     * @param scene Die {@link SubScene}, auf der die Events behandelt werden.
-     * @Vorbedingung scene darf nicht null sein.
-     * @Nachbedingung Maus-Events bewegen das Modell entsprechend.
-     */
-    public void addMouseControl(SubScene scene)
-    {
-        scene.setOnMousePressed(mouseEvent -> mouseIsPressed(mouseEvent));
-        scene.setOnMouseDragged(mouseEvent -> mouseIsDragged(mouseEvent));
-    }
-
-    /**
-     * Speichert aktuelle Mausposition und Winkel bei gedrückter Maustaste.
-     *
-     * @param mouseEvent Das {@link MouseEvent} mit den aktuellen Koordinaten.
-     * @Vorbedingung mouseEvent darf nicht null sein.
-     * @Nachbedingung anchorX/Y und anchorAngleX/Z sind gespeichert.
-     */
-    private void mouseIsPressed(MouseEvent mouseEvent)
-    {
-        anchorX = mouseEvent.getSceneX();
-        anchorY = mouseEvent.getSceneY();
-        anchorAngleX = rotateX.getAngle();
-        anchorAngleZ = rotateZ.getAngle();
-    }
-
-    /**
-     * Bewegt das Modell durch Mausverschiebung: Drehen mit linker, bewegen mit rechter Maustaste.
-     *
-     * @param mouseEvent Das {@link MouseEvent} mit aktueller Position und Taste.
-     * @Vorbedingung mouseEvent darf nicht null sein.
-     * @Nachbedingung Das Modell wird der Eingabe enstsprechend gedreht oder rotiert.
-     */
-    private void mouseIsDragged(MouseEvent mouseEvent)
-    {
-        double deltaX = mouseEvent.getSceneX() - anchorX;
-        double deltaY = mouseEvent.getSceneY() - anchorY;
-
-        if (mouseEvent.getButton() == MouseButton.PRIMARY && !mouseEvent.isShiftDown())
-        {
-            rotateZ.setAngle(anchorAngleZ + deltaX * Constants.Y_DEFAULT_ROTATION_FACTOR);
-            rotateX.setAngle(anchorAngleX + deltaY * Constants.X_DEFAULT_ROTATION_FACTOR);
-        }
-        else if (mouseEvent.getButton() == MouseButton.SECONDARY)
-        {
-            translate.setX(translate.getX() + deltaX);
-            translate.setY(translate.getY() - deltaY);
-            anchorX = mouseEvent.getSceneX();
-            anchorY = mouseEvent.getSceneY();
-        }
-    }
-
-    public MeshView getMeshView()
-    {
-        return meshView;
-    }
-
-    public Polyhedron getPolyhedron()
-    {
-        return polyhedron;
-    }
-
-    public Group getModelGroup()
-    {
-        return modelGroup;
-    }
-
-    public Rotate getRotateX() {
-        return rotateX;
-    }
-
-    public Rotate getRotateY() {
-        return rotateY;
-    }
-
-    public Rotate getRotateZ() {
-        return rotateZ;
-    }
-
-    public Translate getTranslate() {
-        return translate;
-    }
-
     public void rotateObject(Axis axis, double value)
     {
         switch (axis)
@@ -269,5 +171,48 @@ public class ModelController
             default:
                 break;
         }
+    }
+
+    /**
+     * Wendet das Standardmaterial aus {@link Constants} auf das MeshView an.
+     *
+     * @param meshView Das {@link MeshView}, dem das Material zugewiesen wird.
+     * @Vorbedingung meshView darf nicht null sein.
+     * @Nachbedingung meshView hat das Default-Material gesetzt.
+     */
+    private void setMeshDefaultValues(MeshView meshView)
+    {
+        meshView.setMaterial(Constants.DEFAULT_MESHVIEW_MATERIAL);
+    }
+
+    public MeshView getMeshView()
+    {
+        return meshView;
+    }
+
+    public Polyhedron getPolyhedron()
+    {
+        return polyhedron;
+    }
+
+    public Group getModelGroup()
+    {
+        return modelGroup;
+    }
+
+    public Rotate getRotateX() {
+        return rotateX;
+    }
+
+    public Rotate getRotateY() {
+        return rotateY;
+    }
+
+    public Rotate getRotateZ() {
+        return rotateZ;
+    }
+
+    public Translate getTranslate() {
+        return translate;
     }
 }
