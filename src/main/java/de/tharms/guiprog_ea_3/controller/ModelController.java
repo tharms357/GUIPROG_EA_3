@@ -13,8 +13,7 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
 /**
- * //TODO überarbeiten
- * Steuert das 3D-Modell in der Ansicht, inklusive Laden von Polyedern, Positionierung und Benutzer-Interaktion.
+ * Steuert das 3D-Modell, inklusive Rotation und Translation.
  */
 public class ModelController
 {
@@ -101,6 +100,14 @@ public class ModelController
         rotationGroup.getChildren().add(meshView);
     }
 
+    /**
+     * Dreht das Modell um die angegebene Achse relativ zum aktuellen Winkel.
+     *
+     * @param axis Die Achse, um die gedreht wird.
+     * @param value Der Winkel (in Grad), um den zusätzlich rotiert wird.
+     * @Vorbedingung axis darf nicht null sein.
+     * @Nachbedingung Die Rotate-Transformation für die Achse enthält den neuen Winkel.
+     */
     public void rotateObject(Axis axis, double value)
     {
         switch (axis)
@@ -119,6 +126,15 @@ public class ModelController
         }
     }
 
+    /**
+     * Dreht das Modell um die angegebene Achse auf den neuen Winkel anchor + value.
+     *
+     * @param axis Die Achse, um die gedreht wird.
+     * @param value Der Winkel (in Grad), der zum Ankerwinkel addiert wird.
+     * @param anchor Der Ausgangswinkel (in Grad).
+     * @Vorbedingung axis darf nicht null sein.
+     * @Nachbedingung Die Rotate-Transformation für die Achse enthält den Winkel anchor + value.
+     */
     public void rotateObject(Axis axis, double value, double anchor)
     {
         switch (axis)
@@ -137,6 +153,14 @@ public class ModelController
         }
     }
 
+    /**
+     * Verschiebt das Modell entlang der angegebenen Achse relativ zur aktuellen Position.
+     *
+     * @param axis Die Achse, entlang der verschoben wird.
+     * @param value Die Distanz, um die zusätzlich verschoben wird.
+     * @Vorbedingung axis darf nicht null sein.
+     * @Nachbedingung Die Translate-Transformation für die Achse enthält die neue Position.
+     */
     public void translateObject(Axis axis, double value)
     {
         switch (axis)
@@ -155,6 +179,15 @@ public class ModelController
         }
     }
 
+    /**
+     * Verschiebt das Modell entlang der angegebenen Achse auf die neue Position anchor + value.
+     *
+     * @param axis Die Achse, entlang der verschoben wird.
+     * @param value Die Distanz, die zum Ankerwert addiert wird.
+     * @param anchor Der Ausgangspunkt.
+     * @Vorbedingung axis darf nicht null sein.
+     * @Nachbedingung Die Translate-Transformation für die Achse enthält die Position anchor + value.
+     */
     public void translateObject(Axis axis, double value, double anchor)
     {
         switch (axis)

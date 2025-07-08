@@ -22,17 +22,14 @@ public class FileReader
      */
     public static ArrayList<String> lineReader(String filepath)
     {
-        //Erstellen einer ArrayList, in welche die gelesenen Zeilen eingefügt werden
         ArrayList<String> fileDataByLine = new ArrayList<>();
 
-        //Einlesen der Datei
+        // Einlesen der Datei
         try
         {
             Scanner scanner = new Scanner(new File(filepath));
-            //so lange wie noch eine weitere Zeile in der Datei vorhanden ist
             while (scanner.hasNextLine())
             {
-                //Hinzufügen der Zeile zur ArrayList
                 fileDataByLine.add(scanner.nextLine());
             }
             scanner.close();

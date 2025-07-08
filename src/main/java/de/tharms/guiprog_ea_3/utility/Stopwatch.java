@@ -6,7 +6,6 @@ package de.tharms.guiprog_ea_3.utility;
  */
 public class Stopwatch
 {
-    //Singleton-Instanz der Stopwatch-Klasse
     private static Stopwatch instance = null;
 
     //Konstruktor der Stopwatch-Klasse
@@ -31,7 +30,6 @@ public class Stopwatch
         return instance;
     }
 
-    //Deklarieren der Startzeit
     private long startTime;
 
     /**
@@ -41,7 +39,6 @@ public class Stopwatch
      */
     public void start()
     {
-        //Initialisieren der Startzeit
         this.startTime = System.currentTimeMillis();
     }
 
@@ -53,7 +50,6 @@ public class Stopwatch
      */
     public long stop()
     {
-        //Rückgabe der seit Start der Stoppuhr vergangenen Zeit
         return (System.currentTimeMillis() - startTime);
     }
 }

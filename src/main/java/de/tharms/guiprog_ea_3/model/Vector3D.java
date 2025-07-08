@@ -26,7 +26,6 @@ public class Vector3D
         this.z = z;
     }
 
-
     /**
      * Berechnet die Länge des Vektors.
      *
@@ -85,7 +84,8 @@ public class Vector3D
     @Override
     public String toString()
     {
-        return Constants.OUTPUT_NORMAL + Constants.OUTPUT_SEPARATOR + x + Constants.OUTPUT_SEPARATOR + y + Constants.OUTPUT_SEPARATOR + z;
+        return Constants.OUTPUT_NORMAL + Constants.OUTPUT_SEPARATOR + x + Constants.OUTPUT_SEPARATOR +
+                y + Constants.OUTPUT_SEPARATOR + z;
     }
 
     public float getX() {

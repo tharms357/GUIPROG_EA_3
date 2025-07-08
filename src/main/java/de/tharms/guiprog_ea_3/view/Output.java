@@ -15,8 +15,8 @@ public class Output
 {
     /**
      * Diese Methode begrüßt den Nutzer mit einem kurzen Willkommenstext und einem kleinen Kunstbild eines Flugzeuges.
-     * @precondition keine
-     * @postcondition Die Begrüßung des Nutzers durch Ausgaben über die Konsole ist erfolgt.
+     * @Vorbedingung keine
+     * @Nachbedingung Die Begrüßung des Nutzers durch Ausgaben über die Konsole ist erfolgt.
      */
     public static void greetUser()
     {
@@ -79,12 +79,25 @@ public class Output
         }
     }
 
-    //TODO javadoc
+    /**
+     * Gibt den berechneten Oberflächeninhalt in der Konsole aus.
+     *
+     * @param surfaceArea Der zu zeigende Flächeninhalt.
+     * @Vorbedingung surfaceArea wurde berechnet und ist gültig.
+     * @Nachbedingung Die Konsole informiert über den Oberflächeninhalt.
+     */
     public static void printSurfaceArea(float surfaceArea)
     {
         System.out.println(Constants.OUTPUT_SURFACE_AREA + ColorCodes.BLUE + surfaceArea + ColorCodes.RESET);
     }
 
+    /**
+     * Gibt das berechnete Volumen in der Konsole aus.
+     *
+     * @param volume Der zu zeigende Volumenwert.
+     * @Vorbedingung volume wurde berechnet und ist gültig.
+     * @Nachbedingung Die Konsole informiert über das Volumen.
+     */
     public static void printVolume(float volume)
     {
         System.out.println(Constants.OUTPUT_VOLUME + ColorCodes.BLUE + volume + ColorCodes.RESET);
@@ -92,8 +105,8 @@ public class Output
 
     /**
      * Diese Methode gibt die benötigte Zeit für eine Operation aus.
-     * @precondition Der Parameter "time" muss die verstrichene Zeit in Millisekunden enthalten.
-     * @postcondition Die benötigte Zeit wird über die Konsole ausgegeben.
+     * @Vorbedingung  Der Parameter "time" muss die verstrichene Zeit in Millisekunden enthalten.
+     * @Nachbedingung  Die benötigte Zeit wird über die Konsole ausgegeben.
      * @param time Die verstrichene Zeit in Millisekunden.
      */
     public static void timePassed(long time, String action)
@@ -102,7 +115,13 @@ public class Output
                 Constants.OUTPUT_UNITS_MILLISECONDS);
     }
 
-    //TODO Javadoc
+    /**
+     * Gibt das Format der eingelesenen STL-Datei (ASCII oder Binary) aus.
+     *
+     * @param isASCII true, wenn es sich um ASCII-STL handelt, sonst Binary.
+     * @Vorbedingung Der Dateityp wurde korrekt erkannt.
+     * @Nachbedingung Die Konsole zeigt das gefundene Format an.
+     */
     public static void printFileFormat(boolean isASCII)
     {
         if (isASCII)
@@ -119,27 +138,63 @@ public class Output
         System.out.println();
     }
 
+    /**
+     * Gibt an, dass der Server läuft, und zeigt den Port an.
+     *
+     * @param port Der Port, auf dem der Server lauscht.
+     * @Vorbedingung Keine.
+     * @Nachbedingung Die Konsole zeigt die Server-Meldung an.
+     */
     public static void printServerRunningInfo(int port)
     {
         System.out.println();
         System.out.println(Constants.SERVER_RUNNING_MESSAGE + ColorCodes.BLUE + port + ColorCodes.RESET);
     }
 
-    public static void printInformation(String string)
+    /**
+     * Gibt eine allgemeine Informationsnachricht in der Konsole aus.
+     *
+     * @param message Die zu zeigende Nachricht.
+     * @Vorbedingung message darf nicht null sein.
+     * @Nachbedingung Die Konsole gibt die Nachricht aus.
+     */
+    public static void printInformation(String message)
     {
-        System.out.println(string);
+        System.out.println(message);
     }
 
+    /**
+     * Gibt eine Antwortmeldung des Servers in der Konsole aus.
+     *
+     * @param response Der vom Server empfangene Antworttext.
+     * @Vorbedingung response darf nicht null sein.
+     * @Nachbedingung Die Konsole gibt die Antwort des Servers aus.
+     */
     public static void printServerResponse(String response)
     {
         System.out.println(Constants.SERVER_RESPONSE_MESSAGE + response);
     }
 
+    /**
+     * Gibt eine eingehende Verbindung zum Server aus.
+     *
+     * @param socketAddress Die Adresse des verbundenen Clients.
+     * @Vorbedingung socketAddress darf nicht null sein.
+     * @Nachbedingung Die Konsole informiert über die Verbindung und die Adresse des Clients.
+     */
     public static void printServerConnection(SocketAddress socketAddress)
     {
         System.out.println(Constants.SERVER_CONNECTION_FROM + socketAddress);
     }
 
+    /**
+     * Gibt die Euler-Charakteristik des Polyeders aus.
+     *
+     * @param polyhedron Das zu prüfende Polyhedron.
+     * @param eulerCharacteristicValue Der berechnete Wert des Eulerschen Polyedersatzes.
+     * @Vorbedingung polyhedron darf nicht null sein.
+     * @Nachbedingung Die Konsole informiert über die Euler-Charkateristik des Polyeders.
+     */
     public static void printEulerCharacteristicsInformation(Polyhedron polyhedron, int eulerCharacteristicValue)
     {
         if (polyhedron != null && eulerCharacteristicValue == Constants.EULER_CHARACTERISTIC_CLOSED_POLYHEDRON)

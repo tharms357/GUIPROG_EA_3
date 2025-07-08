@@ -82,7 +82,7 @@ public class Vertex
      *
      * @return Der Hashcode als {@code int}.
      *
-     * @Vorbedingung Der Vertex ist gültig initialisiert.
+     * @Vorbedingung Der Vertex ist gültig.
      * @Nachbedingung Zwei gleiche Vertex-Objekte liefern den gleichen Hashcode.
      */
     @Override public int hashCode()

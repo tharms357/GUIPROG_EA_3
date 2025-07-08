@@ -27,19 +27,13 @@ public class Main
         Output.greetUser();
 
         ArgumentController argsController = new ArgumentController(args);
-
-        Polyhedron polyhedron = PolyhedronController.createPolyhedronFromSTL(argsController.getFilepath());
+        Polyhedron polyhedron = PolyhedronController.createPolyhedronFromSTL(
+                argsController.getFilepath());
 
         Output.printSurfaceArea(polyhedron.getSurfaceArea());
-
         Output.printVolume(polyhedron.getVolume());
-
         Output.partiallyPrintSortedList(PolyhedronController.sortFacesBySize(polyhedron));
 
-        Application.launch(ViewerController.class, argsController.getFilepath());
-
-
-        //PolyhedronController.calculateSurfaceAreaUsingThreads(polyhedron);
-        //PolyhedronController.calculateSurfaceAreaUsingThreads2(polyhedron);
+        Application.launch(ViewerController.class);
     }
 }

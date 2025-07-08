@@ -41,6 +41,16 @@ public class InteractionController
 
     private VBox polyhedronDetails;
 
+
+    /**
+     * Bindet die Maus- und Scroll-Events einer SubScene an die jeweiligen Handler-Methoden.
+     *
+     * @param subScene Die 3D-SubScene, auf der die Interaktion stattfinden soll.
+     * @param modelController Der Controller zum Verwalten des 3D-Objekts.
+     * @param cameraController Der Controller zum Steuern der Kamera.
+     * @Vorbedingung subScene, modelController und cameraController dürfen nicht null sein.
+     * @Nachbedingung Maus- und Scroll-Ereignisse werden an die internen Handler weitergeleitet.
+     */
     public void addMouseControl(SubScene subScene, ModelController modelController,
                                 CameraController cameraController)
     {
@@ -52,6 +62,15 @@ public class InteractionController
                 scrollEvent, cameraController));
     }
 
+    /**
+     * Merkt sich aktuelle Maus-Position und Kamera-/Objekt-Zustände beim Drücken der Maustaste.
+     *
+     * @param mouseEvent Das Maus-Event mit den aktuellen Koordinaten.
+     * @param modelController Der Controller zum Verwalten des 3D-Objekts.
+     * @param cameraController Der Controller zum Steuern der Kamera.
+     * @Vorbedingung mouseEvent, modelController und cameraController dürfen nicht null sein.
+     * @Nachbedingung Die internen Anker- und Winkelzustände sind auf die aktuellen Werte gesetzt.
+     */
     private void mouseIsPressed(MouseEvent mouseEvent, ModelController modelController,
                                 CameraController cameraController)
     {
@@ -66,6 +85,15 @@ public class InteractionController
         objectTranslateY = modelController.getTranslate().getY();
     }
 
+    /**
+     * Verschiebt Kamera oder Objekt entsprechend der Mausbewegung und gedrückter Tasten.
+     *
+     * @param mouseEvent Das Maus-Event mit den neuen Koordinaten.
+     * @param modelController Der Controller zum Verwalten des 3D-Objekts.
+     * @param cameraController Der Controller zum Steuern der Kamera.
+     * @Vorbedingung mouseEvent, modelController und cameraController dürfen nicht null sein.
+     * @Nachbedingung Kamera- oder Objekt-Transformationen wurden gemäß Mausrichtung angepasst.
+     */
     private void mouseIsDragged(MouseEvent mouseEvent, ModelController modelController,
                                 CameraController cameraController)
     {
@@ -95,6 +123,14 @@ public class InteractionController
         }
     }
 
+    /**
+     * Zoomt die Kamera in der SubScene auf Basis des Scroll-Rad-Events.
+     *
+     * @param scrollEvent Das Scroll-Event mit Delta-Y-Bewegung.
+     * @param cameraController Der Controller zum Anpassen der Kameraposition.
+     * @Vorbedingung scrollEvent und cameraController dürfen nicht null sein.
+     * @Nachbedingung Die Kameratranslation in Z-Richtung wurde aktualisiert.
+     */
     public void mouseIsScrolled(ScrollEvent scrollEvent,
                                 CameraController cameraController)
     {
@@ -142,6 +178,14 @@ public class InteractionController
         return sidebar;
     }
 
+    /**
+     * Erstellt eine Checkbox zum Umschalten der Wireframe-Ansicht.
+     *
+     * @param viewerController Der Controller, dem die Aktion zugeordnet wird.
+     * @return Eine {@link CheckBox}, die den Wireframe-Modus aktiviert/deaktiviert.
+     * @Vorbedingung viewerController darf nicht null sein.
+     * @Nachbedingung Die Checkbox ist mit dem DrawMode-Update verknüpft.
+     */
     private CheckBox createShowWireframeCheckBox(ViewerController viewerController)
     {
         CheckBox showWireframe = new CheckBox(Constants.CHECKBOX_SHOW_WIREFRAME_ONLY);
@@ -151,6 +195,12 @@ public class InteractionController
         return showWireframe;
     }
 
+    /**
+     * Erstellt eine Checkbox zur Sichtbarkeitseinstellung des Koordinatensystems.
+     *
+     * @return Eine {@link CheckBox}, die die Sichtbarkeit der Achsen steuert.
+     * @Nachbedingung Die Checkbox ist mit dem Achsen-Update verknüpft.
+     */
     private CheckBox createShowAxisCheckBox()
     {
         CheckBox showAxis = new CheckBox(Constants.CHECKBOX_SHOW_COORDINATE_SYSTEM);
@@ -309,6 +359,12 @@ public class InteractionController
         return helpMenu;
     }
 
+    /**
+     * Erstellt ein Anleitungs-Menüpunkt im Hilfe-Menü und zeigt bei Klick die Programm-Anweisungen.
+     *
+     * @return Ein {@link MenuItem}, das ein Dialogfenster mit Kurzanleitung öffnet.
+     * @Nachbedingung Der Dialog mit Kurzanleitung wird angezeigt.
+     */
     private MenuItem createInstructionMenuItem()
     {
         MenuItem instructions = new MenuItem(Constants.PROGRAM_INSTRUCTIONS);
@@ -333,6 +389,12 @@ public class InteractionController
         return instructions;
     }
 
+    /**
+     * Erstellt ein Info-Menüpunkt im Hilfe-Menü und zeigt bei Klick die Programm-Details.
+     *
+     * @return Ein {@link MenuItem}, das ein Informationsfenster über die Anwendung öffnet.
+     * @Nachbedingung Der Info-Dialog wird angezeigt.
+     */
     public MenuItem createInfoMenuItem()
     {
         MenuItem about = new MenuItem(Constants.MENU_ABOUT_STL_VIEWER);

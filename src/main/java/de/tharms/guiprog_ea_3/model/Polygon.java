@@ -24,10 +24,6 @@ public class Polygon
         this.edges = edges;
     }
 
-    public List<Edge> getEdges()
-    {
-        return edges;
-    }
 
     /**
      * Berechnet die Fläche des Polygons.
@@ -64,6 +60,7 @@ public class Polygon
         return (float) (Constants.NUMBERS_ZERO_DOT_FIVE * areaVector.getLength());
     }
 
+
     /**
      * Liefert alle Start-Vertices der Kanten des Polygons.
      * Die zurückgegebene Liste enthält für jede Kante genau einen Start-Vertex.
@@ -84,6 +81,14 @@ public class Polygon
         return vertices;
     }
 
+    /**
+     * Ermittelt alle einzigartigen {@link Edge}-Objekte, die in der Fläche verwendet werden.
+     * Es doppeln sich keine Objekte mit gleichen Werten.
+     *
+     * @return Eine Liste einzigartiger {@link Edge}-Objekte.
+     * @Vorbedingung Das Polygon ist gültig.
+     * @Nachbedingung Gibt eine Liste mit einzigartigen {@link Edge}-Objekten der Fläche zurück.
+     */
     public LinkedHashSet<Edge> getUniqueEdges()
     {
         List<Edge> edges = getEdges();
@@ -99,7 +104,7 @@ public class Polygon
      * Es doppeln sich keine Objekte mit gleichen Werten.
      *
      * @return Eine Liste einzigartiger {@link Vertex}-Objekte.
-     * @Vorbedingung Das Polygon ist gültig und enthält Edges und Vertices.
+     * @Vorbedingung Das Polygon ist gültig.
      * @Nachbedingung Gibt eine Liste mit einzigartigen {@link Vertex}-Objekten der Fläche zurück.
      */
     public LinkedHashSet<Vertex> getUniqueVertices()
@@ -113,5 +118,10 @@ public class Polygon
         }
 
         return uniqueVertices;
+    }
+
+    public List<Edge> getEdges()
+    {
+        return edges;
     }
 }

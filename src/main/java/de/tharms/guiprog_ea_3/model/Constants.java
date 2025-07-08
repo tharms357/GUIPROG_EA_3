@@ -5,6 +5,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 
+/**
+ * Dieses Interface enthält alle im Programm benutzten Konstanten.
+ */
 public interface Constants
 {
     String OUTPUT_GREET_USER = "\nWillkommen zur GUIPROG Entwicklungsarbeit!\n";
@@ -180,4 +183,5 @@ public interface Constants
             "3. Die Ansicht lässt sich in der Seitenleiste nach Bedarf anpassen.\n" +
             "4. Unter 'Polyeder-Informationen' in der Seitenleiste erscheinen Details zum aktuell geladenen Modell.\n" +
             "5. Im Menü 'Ansicht' lässt sich das Koordinatensystem oder die Modellposition jederzeit zurücksetzen.\n";
+    double NUMBERS_ZERO_DOUBLE = 0.0;
 }

@@ -18,7 +18,12 @@ public class CameraController
     private final Rotate cameraRotateX = new Rotate(0, Rotate.X_AXIS);
     private final Rotate cameraRotateY = new Rotate(0, Rotate.Y_AXIS);
 
-
+    /**
+     * Initialisiert die Kamera-Gruppe und setzt die Kamera auf die Standard-Ansicht.
+     *
+     * @Vorbedingung Keine.
+     * @Nachbedingung Die Kamera ist der Gruppe hinzugefügt und auf die Default-Transformationen eingestellt.
+     */
     public CameraController()
     {
         cameraGroup.getTransforms().addAll(cameraRotateX, cameraRotateY, cameraTranslate);
@@ -27,6 +32,15 @@ public class CameraController
         resetView();
     }
 
+    /**
+     * Dreht die Kamera um die angegebene Achse relativ zum gegebenen Ankerwinkel.
+     *
+     * @param axis Die Achse, um die gedreht werden soll (X oder Z).
+     * @param value Der Betrag der Winkeländerung in Grad.
+     * @param anchor Der Ausgangswinkel, zu dem der Wert addiert wird.
+     * @Vorbedingung axis, value und anchor sind gültig.
+     * @Nachbedingung Die entsprechende Rotate-Transformation enthält den neuen Winkel (anchor + value).
+     */
     public void rotateCamera(Axis axis, double value, double anchor)
     {
         switch (axis)

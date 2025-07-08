@@ -16,13 +16,54 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
+/**
+ * Client-Klasse, die sich mit dem Server verbindet und JSON-Commands sendet.
+ */
 public class ServerClient
 {
+    /**
+     * Start des Clients. Verbindet sich zum Server und startet die Command-Verarbeitung.
+     *
+     * @param args Kommandozeilenargumente (werden nicht verwendet).
+     * @Vorbedingung Keine.
+     * @Nachbedingung Der Client wurde gestartet und beendet nach Eingabe von "exit".
+     */
     public static void main(String[] args)
     {
         startClient(Constants.TCP_PORT, Constants.TCP_HOSTNAME);
     }
 
+
+    /**
+     * Erzeugt und öffnet einen Client-Socket zum angegebenen Host und Port.
+     *
+     * @param host Hostname oder IP-Adresse des Servers.
+     * @param port Port, auf dem der Server lauscht.
+     * @return Ein verbundener {@link Socket}.
+     * @Vorbedingung host darf nicht null sein, port liegt im gültigen Bereich.
+     * @Nachbedingung Ein offener Socket wird zurückgegeben.
+     * @throws RuntimeException mit erläuternder Fehlermeldung.
+     */
+    public static Socket createClient(String host, int port)
+    {
+        try
+        {
+            return new Socket(host, port);
+        }
+        catch (IOException ioException)
+        {
+            throw new RuntimeException(Constants.SOCKET_CREATION_FAILURE + ioException.getMessage());
+        }
+    }
+
+    /**
+     * Öffnet eine Socket-Verbindung zum Server, liest Eingaben aus der Konsole und sendet JSON-Commands.
+     *
+     * @param port Port, unter dem der Server erreichbar ist.
+     * @param host Host-Adresse des Servers.
+     * @Vorbedingung port liegt im gültigen Bereich, host darf nicht null sein.
+     * @Nachbedingung Alle Benutzereingaben wurden als JSON an den Server gesendet und die Antworten angezeigt.
+     */
     public static void startClient(int port, String host)
     {
         Output.printInformation(String.format(Constants.CLIENT_START_INFO, host, port));
@@ -76,18 +117,23 @@ public class ServerClient
         }
         catch (NumberFormatException numberFormatException)
         {
-            //TODO
-            System.out.println(Constants.INVALID_FLOAT_VALUE + numberFormatException.getMessage());
+            Output.printInformation(Constants.INVALID_FLOAT_VALUE + numberFormatException.getMessage());
         }
         catch (IOException ioException)
         {
-            //TODO Exception fixen
-            System.out.println("IOException" + ioException.getMessage());
+            Output.printInformation(ioException.getMessage());
         }
 
         Output.printInformation(Constants.CONNECTION_CLOSED);
     }
 
+    /**
+     * Liest eine Antwortzeile vom Server und gibt sie aus.
+     *
+     * @param bufferedReader Reader, mit dem vom Server gelesen wird.
+     * @Vorbedingung bufferedReader darf nicht null sein.
+     * @Nachbedingung Eine Zeile wurde eingelesen und durch Output.printServerResponse angezeigt.
+     */
     private static void receiveCommand(BufferedReader bufferedReader)
     {
         String serverResponse = Constants.EMPTY_STRING;
@@ -102,21 +148,16 @@ public class ServerClient
         Output.printServerResponse(serverResponse);
     }
 
-
+    /**
+     * Sendet einen JSON-formatierten Command-String an den Server.
+     *
+     * @param printWriter Writer, der auf den Server-Socket-Ausgang zeigt.
+     * @param json Der als String serialisierte Command in JSON-Format.
+     * @Vorbedingung printWriter und json dürfen nicht null sein.
+     * @Nachbedingung Der JSON-String wurde an den Server gesendet.
+     */
     private static void sendCommand(PrintWriter printWriter, String json)
     {
         printWriter.println(json);
-    }
-
-    public static Socket createClient(String host, int port)
-    {
-        try
-        {
-            return new Socket(host, port);
-        }
-        catch (IOException ioException)
-        {
-            throw new RuntimeException(Constants.SOCKET_CREATION_FAILURE + ioException.getMessage());
-        }
     }
 }

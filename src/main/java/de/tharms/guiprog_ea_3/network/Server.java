@@ -16,6 +16,9 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * Server-Klasse, die JSON-Befehle entgegennimmt und an den ViewerController weiterleitet.
+ */
 public class Server extends Thread
 {
     int port;
@@ -24,6 +27,14 @@ public class Server extends Thread
     Gson gson;
     ViewerController viewerController;
 
+    /**
+     * Initialisiert einen neuen Server-Thread auf dem angegebenen Port und verknüpft ihn mit dem ViewerController.
+     *
+     * @param port Der TCP-Port, auf dem Verbindungen angenommen werden.
+     * @param viewerController Der Controller, an den empfangene Commands weitergeleitet werden.
+     * @Vorbedingung ViewerController darf nicht null sein.
+     * @Nachbedingung Der Server ist startbereit, running ist auf true gesetzt.
+     */
     public Server(int port, ViewerController viewerController)
     {
         this.port = port;
@@ -32,6 +43,13 @@ public class Server extends Thread
         this.viewerController = viewerController;
     }
 
+    /**
+     * Öffnet den ServerSocket und nimmt Verbindungen an,
+     * liest JSON-Commands, führt sie aus und antwortet mit einer Bestätigung.
+     *
+     * @Vorbedingung Dieser Thread wurde gestartet und running ist gleich true.
+     * @Nachbedingung Solange running gleich true ist, akzeptiert und verarbeitet der Server eingehende Befehle.
+     */
     @Override
     public void run()
     {
@@ -74,6 +92,13 @@ public class Server extends Thread
         }
     }
 
+    /**
+     * Führt einen empfangenen Command anhand des Typs aus, indem er das ModelController-Objekt aufruft.
+     *
+     * @param command Das Command-Objekt, enthält action, axis und value.
+     * @Vorbedingung command darf nicht null sein, action und axis sind gültige Enumerationen.
+     * @Nachbedingung Die entsprechende Methode im ModelController wurde aufgerufen oder eine Fehlermeldung ausgegeben.
+     */
     private void executeCommand(Command command)
     {
         ServerCommands action = command.action;
@@ -104,6 +129,12 @@ public class Server extends Thread
         }
     }
 
+    /**
+     * Beendet den Server-Loop und schließt den ServerSocket.
+     *
+     * @Vorbedingung Der Server läuft (running gleich true) oder wurde zuvor gestartet.
+     * @Nachbedingung running ist gleich false und der ServerSocket ist geschlossen.
+     */
     public void close()
     {
         running = false;

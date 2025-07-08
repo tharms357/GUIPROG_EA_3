@@ -25,14 +25,12 @@ public class ViewerController extends Application
     private PolyhedronController polyhedronController;
 
 
-
-
     /**
      * Startmethode der JavaFX-Anwendung. Setzt die primaryStage und zeigt die Hauptszene an.
      *
      * @param primaryStage Die primäre Stage.
      * @Vorbedingung primaryStage darf nicht null sein.
-     * @Nachbedingung Die Stage zeigt die geladene Szene mit Menüs und 3D-Ansicht.
+     * @Nachbedingung Die Stage zeigt die geladene Szene mit Menüs und 3D-Ansicht und der Server ist gestartet.
      */
     @Override
     public void start(Stage primaryStage)
@@ -65,7 +63,12 @@ public class ViewerController extends Application
         launch(args);
     }
 
-
+    /**
+     * Startet den Server und markiert ihn als Daemon.
+     *
+     * @Vorbedingung Keine.
+     * @Nachbedingung Ein neuer Server-Thread lauscht auf Port TCP_PORT.
+     */
     public void startServer()
     {
         Server server = new Server(Constants.TCP_PORT, this);
@@ -110,8 +113,8 @@ public class ViewerController extends Application
         SubScene subScene = create3DSubScene();
 
         AnchorPane overlay = new AnchorPane(rightSidebar);
-        AnchorPane.setTopAnchor(rightSidebar, 0.0);
-        AnchorPane.setRightAnchor(rightSidebar, 0.0);
+        AnchorPane.setTopAnchor(rightSidebar, Constants.NUMBERS_ZERO_DOUBLE);
+        AnchorPane.setRightAnchor(rightSidebar, Constants.NUMBERS_ZERO_DOUBLE);
         overlay.setPickOnBounds(false);
 
         StackPane centerStack = new StackPane(subScene, overlay);

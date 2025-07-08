@@ -11,19 +11,18 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Die Klasse {@code STLReader} bietet Funktionen zum Einlesen und Verarbeiten von STL-Dateien
- * im ASCII- oder Binärformat zur Erzeugung von {@link Polyhedron}-Objekten.
+ * Diese Klasse bietet Funktionen zum Einlesen und Verarbeiten von STL-Dateien
+ * im ASCII- oder Binärformat zur Erzeugung von Polyhedron-Objekten.
  */
 public class STLReader
 {
-
     /**
      * Liest eine ASCII-STL-Datei und wandelt sie in ein {@link Polyhedron}-Objekt um.
      *
      * @param filepath Der Name der Datei.
      * @return Ein {@link Polyhedron}-Objekt, das aus den ASCII-Daten erzeugt wurde.
      *
-     * @Vorbedingung facesByLine ist und filepath sind nicht null.
+     * @Vorbedingung filepath ist nicht null.
      * @Nachbedingung Gibt ein korrekt erzeugtes {@link Polyhedron}-Objekt zurück.
      */
     public static Polyhedron createPolyhedronFromASCIISTL(String filepath)
@@ -223,9 +222,19 @@ public class STLReader
             faces.add(createFaceFromByteBuffer(byteBuffer));
         }
 
-        return new Polyhedron(faces, "xyz_cube.stl");
+        return new Polyhedron(faces, polyhedronName);
     }
 
+    /**
+     * Liest aus dem aktuellen Buffer eine Dreiecks-Facette und erzeugt ein {@link Face}-Objekt.
+     * Dabei werden zuerst der Normalenvektor, dann drei Vertices und zuletzt das Attribut-Short übersprungen.
+     *
+     * @param byteBuffer Der auf das Binär-STL-Datenarray positionierte {@link ByteBuffer}.
+     * @return Ein neues {@link Face}-Objekt, bestehend aus einem {@link Triangle} und seiner Normalen.
+     *
+     * @Vorbedingung byteBuffer ist nicht null und auf die erste Facette positioniert.
+     * @Nachbedingung Der Buffer-Position steht direkt hinter der eingelesenen Facette (nach dem Attribut-Short).
+     */
     private static Face createFaceFromByteBuffer(ByteBuffer byteBuffer)
     {
         Vector3D normal = new Vector3D(
