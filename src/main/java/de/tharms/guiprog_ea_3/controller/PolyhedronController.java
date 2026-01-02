@@ -53,7 +53,6 @@ public class PolyhedronController
      */
     public static Polyhedron createPolyhedronFromSTL(String filepath)
     {
-        //TODO Einlesen in extra methode für FileReader auslagern?
         Output.printFileReadingStart(filepath);
 
         Polyhedron polyhedron;
@@ -63,6 +62,7 @@ public class PolyhedronController
             throw new IllegalArgumentException(Constants.INVALID_FILE_FORMAT);
         }
 
+        // Erstellen des Polyeders
         try
         {
             File file = new File(filepath);
@@ -98,7 +98,6 @@ public class PolyhedronController
         }
 
         Output.printEulerCharacteristicsInformation(polyhedron, PolyhedronController.isClosed(polyhedron));
-
         return polyhedron;
     }
 
@@ -116,11 +115,9 @@ public class PolyhedronController
 
         int numberOfThreads = Runtime.getRuntime().availableProcessors();
         float[] results = new float[numberOfThreads];
-
         List<Thread> threads = ThreadController.startAreaCalculation(polyhedron, numberOfThreads, results);
 
         ThreadController.waitForAllThreads(threads);
-
         float surfaceArea = 0;
 
         for (float area : results)
@@ -129,7 +126,6 @@ public class PolyhedronController
         }
 
         Output.timePassed(Stopwatch.getInstance().stop(), Constants.AREA_CALCULATION_PARALLEL);
-
         return surfaceArea;
     }
 
@@ -216,6 +212,7 @@ public class PolyhedronController
         LinkedHashSet<Vertex> uniqueVertices = new LinkedHashSet<>();
         LinkedHashSet<Edge> uniqueEdges = new LinkedHashSet<>();
 
+        // Einzigartige Vertices und Edges holen
         for (Face face : polyhedron.getFaces())
         {
             Polygon poly = face.getPolygon();

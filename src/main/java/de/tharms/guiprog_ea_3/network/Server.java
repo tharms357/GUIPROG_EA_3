@@ -53,23 +53,32 @@ public class Server extends Thread
     @Override
     public void run()
     {
-        try {
+        // ServerSocket auf dem angegebenen Port öffnen
+        try
+        {
             serverSocket = new ServerSocket(port);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        }
+        catch (IOException ioException)
+        {
+            throw new RuntimeException(ioException);
         }
         Output.printServerRunningInfo(port);
 
+        // Warte auf eingehende Verbindungen
         while (running)
         {
             Socket socket = null;
-            try {
+            try
+            {
                 socket = serverSocket.accept();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            }
+            catch (IOException ioException)
+            {
+                throw new RuntimeException(ioException);
             }
             Output.printServerConnection(socket.getRemoteSocketAddress());
 
+            // JSON-Commands lesen und ausführen
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                  PrintWriter writer = new PrintWriter(socket.getOutputStream(), true))
             {
@@ -80,15 +89,20 @@ public class Server extends Thread
                     executeCommand(command);
                     writer.println(ColorCodes.GREEN + Constants.COMMAND_EXECUTED + ColorCodes.RESET);
                 }
-            } catch (IOException e)
+            }
+            catch (IOException ioException)
             {
-                System.out.println(e.toString());
+                Output.printInformation(Constants.ERROR_READING_COMMAND + ioException.getMessage());
             }
         }
-        try {
+        // Schließe den ServerSocket, sobald running = false
+        try
+        {
             serverSocket.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        }
+        catch (IOException ioException)
+        {
+            throw new RuntimeException(Constants.ERROR_CLOSING_SOCKET + ioException);
         }
     }
 

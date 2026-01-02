@@ -38,6 +38,7 @@ public class STLReader
             facesByLine.removeFirst();
         }
 
+        // Erstellen der Faces aus eingelesenen Zeilen
         for (String[] face : facesByLine)
         {
             try
@@ -83,6 +84,7 @@ public class STLReader
         {
             if (currentLine.startsWith(Constants.STL_ASCII_KEYWORD_VERTEX))
             {
+                // Extrahieren der Werte aus der Zeile
                 currentVertex = currentLine.trim().replaceFirst(Constants.STL_ASCII_SPLIT_VERTICES_REGEX,
                         Constants.EMPTY_STRING).split(Constants.STL_ASCII_SPLIT_REGEX);
 
@@ -120,6 +122,7 @@ public class STLReader
      */
     private static Vector3D createNormalFromLine(String line)
     {
+        // Extrahieren der Werte aus der Zeile
         String[] values = line.trim().replaceFirst(Constants.STL_ASCII_SPLIT_NORMAL_REGEX,
                 Constants.EMPTY_STRING).split(Constants.STL_ASCII_SPLIT_REGEX);
 
@@ -190,7 +193,7 @@ public class STLReader
      * @param filename Der Name der Datei.
      * @return Ein {@link Polyhedron}-Objekt, das aus den Binärdaten erzeugt wurde.
      *
-     * @Vorbedingung data != null && data enthält gültige Binär-STL-Daten
+     * @Vorbedingung data ist ungleich null und data enthält gültige Binär-STL-Daten
      * @Nachbedingung Gibt ein vollständig aufgebautes {@link Polyhedron}-Objekt zurück.
      */
     public static Polyhedron createPolyhedronFromBinarySTL(byte[] data, String filename)
@@ -200,6 +203,7 @@ public class STLReader
         String headerName = new String(header).trim();
         String polyhedronName;
 
+        // Setzen des Polyeder-Namens
         if (headerName.isEmpty())
         {
             polyhedronName = filename;
@@ -209,6 +213,7 @@ public class STLReader
             polyhedronName = headerName;
         }
 
+        // Überspringen des Headers und Erstellen des ByteBuffers
         ByteBuffer byteBuffer = ByteBuffer
                 .wrap(data)
                 .order(ByteOrder.LITTLE_ENDIAN)

@@ -54,12 +54,13 @@ public class ModelController
         {
             this.polyhedron = PolyhedronController.createPolyhedronFromSTL(filepath);
         }
-        catch (IllegalArgumentException e)
+        catch (IllegalArgumentException illegalArgumentException)
         {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle(Constants.FILE_READING_ERROR);
             alert.setHeaderText(Constants.INVALID_STL_FILE);
-            alert.setContentText(String.format(Constants.INVALID_STL_FILE_MESSAGE, filepath, e.getMessage()));
+            alert.setContentText(String.format(Constants.INVALID_STL_FILE_MESSAGE, filepath,
+                    illegalArgumentException.getMessage()));
             alert.showAndWait();
         }
     }

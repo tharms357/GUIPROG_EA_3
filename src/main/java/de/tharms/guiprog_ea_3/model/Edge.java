@@ -2,8 +2,10 @@ package de.tharms.guiprog_ea_3.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
+/**
+ * Repräsentiert eine Kante, die zwei {@link Vertex}-Objekte verbindet.
+ */
 public class Edge
 {
     Vertex start;

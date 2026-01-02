@@ -112,6 +112,7 @@ public class ViewerController extends Application
 
         SubScene subScene = create3DSubScene();
 
+        // Overlay für die SideBar, damit sie über der SubScene liegt
         AnchorPane overlay = new AnchorPane(rightSidebar);
         AnchorPane.setTopAnchor(rightSidebar, Constants.NUMBERS_ZERO_DOUBLE);
         AnchorPane.setRightAnchor(rightSidebar, Constants.NUMBERS_ZERO_DOUBLE);
@@ -119,12 +120,14 @@ public class ViewerController extends Application
 
         StackPane centerStack = new StackPane(subScene, overlay);
 
+        // Setzen des Grundlayouts
         BorderPane root = new BorderPane();
         root.setTop(menuBar);
         root.setCenter(centerStack);
 
         Scene scene = new Scene(root, Constants.STL_VIEWER_WINDOW_WIDTH, Constants.STL_VIEWER_WINDOW_HEIGHT);
 
+        // Automatisches Anpassen der SubScene-Größe an die Größe des CenterStack
         subScene.widthProperty().bind(centerStack.widthProperty());
         subScene.heightProperty().bind(centerStack.heightProperty());
 
@@ -145,14 +148,23 @@ public class ViewerController extends Application
         modelController = new ModelController();
         cameraController = new CameraController();
 
-        group3d.getChildren().addAll(modelController.getModelGroup(), interactionController.createCoordinateAxes(),
+        // Hinzufügen von Modell, Koordinatensystem und Kamera
+        group3d.getChildren().addAll(
+                modelController.getModelGroup(),
+                interactionController.createCoordinateAxes(),
                 cameraController.getCameraGroup());
 
-        SubScene subScene = new SubScene(group3d, Constants.STL_VIEWER_SUBSCENE_WIDTH,
-                Constants.STL_VIEWER_SUBSCENE_HEIGHT, true, SceneAntialiasing.BALANCED);
+        SubScene subScene = new SubScene(
+                group3d,
+                Constants.STL_VIEWER_SUBSCENE_WIDTH,
+                Constants.STL_VIEWER_SUBSCENE_HEIGHT,
+                true,
+                SceneAntialiasing.BALANCED);
+
         subScene.setFill(Color.LIGHTGRAY);
         subScene.setCamera(cameraController.getCamera());
 
+        // Maussteuerung hinzufügen
         interactionController.addMouseControl(subScene, modelController, cameraController);
 
         return subScene;

@@ -72,6 +72,7 @@ public class ServerClient
         boolean running = true;
         Gson gson = new Gson();
 
+        // Öffnen von Socket, Scanner, Reader und Writer
         try (Socket socket = createClient(host, port);
              Scanner consoleInput = new Scanner(System.in);
              PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
@@ -96,14 +97,15 @@ public class ServerClient
                     break;
                 }
 
-
+                // Aufteilen der Eingabe in Command, Axis und Wert
                 String[] inputValues = inputMessage.split(Constants.CLIENT_INPUT_MESSAGE_SPLIT_REGEX);
-                if (inputValues.length != 3)
+                if (inputValues.length != Constants.NUMBERS_THREE)
                 {
                     Output.printInformation(ColorCodes.RED + Constants.INVALID_COMMAND + ColorCodes.RESET);
                     continue;
                 }
 
+                // Erstellen und Senden des Commands
                 Command command = new Command(
                         ServerCommands.valueOf(inputValues[Constants.INDEX_ZERO].toUpperCase()),
                         Axis.valueOf(inputValues[Constants.INDEX_ONE].toUpperCase()),
@@ -112,6 +114,7 @@ public class ServerClient
                 String json = gson.toJson(command);
                 sendCommand(output, json);
 
+                // Antwort des Servers empfangen und ausgeben
                 receiveCommand(input);
             }
         }
@@ -121,7 +124,7 @@ public class ServerClient
         }
         catch (IOException ioException)
         {
-            Output.printInformation(ioException.getMessage());
+            Output.printInformation(Constants.ERROR_CLOSING_SOCKET + ioException.getMessage());
         }
 
         Output.printInformation(Constants.CONNECTION_CLOSED);

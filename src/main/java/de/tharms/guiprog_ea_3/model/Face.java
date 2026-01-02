@@ -1,7 +1,8 @@
 package de.tharms.guiprog_ea_3.model;
 
-import java.util.*;
-
+/**
+ * Repräsentiert eine Fläche, die durch ein Polygon und einen Normalenvektor definiert ist.
+ */
 public class Face
 {
     Polygon polygon;

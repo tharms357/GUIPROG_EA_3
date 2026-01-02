@@ -29,10 +29,10 @@ public class ThreadController
         for (int i = 0; i < numberOfThreads; i++)
         {
             int threadIndex = i;
-
             int start = i * areasToCalculate;
             int end = calculateThreadEndIndex(start, areasToCalculate, polyhedron);
 
+            // Arbeitsbereich für jeden Thread festlegen
             Runnable task = () -> {
                 float areaCumulated = 0;
                 for (int j = start; j < end; j++)

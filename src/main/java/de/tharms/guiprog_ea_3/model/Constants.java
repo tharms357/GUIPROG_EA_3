@@ -12,6 +12,7 @@ public interface Constants
 {
     String OUTPUT_GREET_USER = "\nWillkommen zur GUIPROG Entwicklungsarbeit!\n";
 
+    double NUMBERS_ZERO_DOUBLE = 0.0;
     int INDEX_ONE = 1;
     double NUMBERS_ZERO_DOT_FIVE = 0.5;
     int INDEX_ZERO = 0;
@@ -183,5 +184,8 @@ public interface Constants
             "3. Die Ansicht lässt sich in der Seitenleiste nach Bedarf anpassen.\n" +
             "4. Unter 'Polyeder-Informationen' in der Seitenleiste erscheinen Details zum aktuell geladenen Modell.\n" +
             "5. Im Menü 'Ansicht' lässt sich das Koordinatensystem oder die Modellposition jederzeit zurücksetzen.\n";
-    double NUMBERS_ZERO_DOUBLE = 0.0;
+    double INSTRUCTIONS_TEXTAREA_WIDTH = 450;
+    double INSTRUCTIONS_TEXTAREA_HEIGHT = 230;
+    String ERROR_READING_COMMAND = "Fehler beim Einlesen des übergebenen Befehls";
+    String ERROR_CLOSING_SOCKET = "Fehler beim Schließen des Sockets";
 }

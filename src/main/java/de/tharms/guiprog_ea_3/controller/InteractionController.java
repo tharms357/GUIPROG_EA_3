@@ -97,6 +97,7 @@ public class InteractionController
     private void mouseIsDragged(MouseEvent mouseEvent, ModelController modelController,
                                 CameraController cameraController)
     {
+        // Berechnen der Differenz zwischen aktueller und Anker-Mausposition
         double deltaX = mouseEvent.getSceneX() - anchorX;
         double deltaY = mouseEvent.getSceneY() - anchorY;
 
@@ -316,6 +317,24 @@ public class InteractionController
     {
         Menu view = new Menu(Constants.MENU_VIEW);
 
+        MenuItem resetModel = createResetModelMenuItem(viewerController);
+        MenuItem resetView = createResetViewMenuItem(viewerController);
+
+        view.getItems().addAll(resetModel, resetView);
+
+        return view;
+    }
+
+    /**
+     * Erstellt ein Menü-Punkt zum Zurücksetzen der Modell-Position.
+     *
+     * @param viewerController Der {@link ViewerController}, dessen ModelController verwendet wird.
+     * @return Ein {@link MenuItem}, das bei Auslösung die Modell-Transformationen zurücksetzt.
+     * @Vorbedingung viewerController und dessen ModelController dürfen nicht null sein.
+     * @Nachbedingung Beim Klick wird die Position des Modells auf den Ursprung zurückgesetzt.
+     */
+    public MenuItem createResetModelMenuItem(ViewerController viewerController)
+    {
         MenuItem resetModel = new MenuItem(Constants.MENU_RESET_MODEL_POSITION);
         resetModel.setOnAction(actionEvent -> {
             if (viewerController.getModelController() != null)
@@ -324,6 +343,19 @@ public class InteractionController
             }
         });
 
+        return resetModel;
+    }
+
+    /**
+     * Erstellt einen Menü-Punkt zum Zurücksetzen der Kamerasicht und Sichtbarkeit des Koordinatensystems.
+     *
+     * @param viewerController Der {@link ViewerController}, dessen CameraController verwendet wird.
+     * @return Ein {@link MenuItem}, das bei Auslösung die Kamera zurücksetzt und das Koordinatensystem einblendet.
+     * @Vorbedingung viewerController und dessen CameraController dürfen nicht null sein.
+     * @Nachbedingung Beim Klick wird die Kamera auf die Standard-Ansicht zurückgesetzt und die Achsen wieder sichtbar.
+     */
+    public MenuItem createResetViewMenuItem(ViewerController viewerController)
+    {
         MenuItem resetView = new MenuItem(Constants.MENU_RESET_COORDINATE_SYSTEM);
         resetView.setOnAction(actionEvent -> {
             if (viewerController.getCameraController() != null)
@@ -336,9 +368,7 @@ public class InteractionController
             updateShowAxis();
         });
 
-        view.getItems().addAll(resetModel, resetView);
-
-        return view;
+        return resetView;
     }
 
     /**
@@ -379,8 +409,8 @@ public class InteractionController
             TextArea content = new TextArea(Constants.PROGRAM_INSTRUCTIONS_TEXT);
             content.setEditable(false);
             content.setWrapText(true);
-            content.setPrefWidth(450);
-            content.setPrefHeight(230);
+            content.setPrefWidth(Constants.INSTRUCTIONS_TEXTAREA_WIDTH);
+            content.setPrefHeight(Constants.INSTRUCTIONS_TEXTAREA_HEIGHT);
 
             dialog.getDialogPane().setContent(content);
             dialog.showAndWait();
@@ -444,6 +474,8 @@ public class InteractionController
         title.setStyle(Constants.SIDEBAR_POLYHEDRON_INFORMATION_STYLE);
 
         polyhedronDetails.getChildren().clear();
+
+        // Neu-Setzen der Textfelder
         polyhedronDetails.getChildren().addAll(
                 title,
                 createTextField(
@@ -500,21 +532,23 @@ public class InteractionController
     public Group createCoordinateAxes()
     {
         double axisLength = Constants.COORDINATE_AXIS_LENGTH;
+
+        // Erstellen der Achsen aus Zylinder-Objekten
         Cylinder xAxis = new Cylinder(Constants.COORDINATE_AXIS_DIAMETER, axisLength);
+        Cylinder yAxis = new Cylinder(Constants.COORDINATE_AXIS_DIAMETER, axisLength);
+        Cylinder zAxis = new Cylinder(Constants.COORDINATE_AXIS_DIAMETER, axisLength);
+
         xAxis.setMaterial(new PhongMaterial(Color.RED));
         xAxis.setRotationAxis(Rotate.Z_AXIS);
         xAxis.setRotate(Constants.COORDINATE_AXIS_Z_ROTATE);
 
-        Cylinder yAxis = new Cylinder(Constants.COORDINATE_AXIS_DIAMETER, axisLength);
         yAxis.setMaterial(new PhongMaterial(Color.GREEN));
 
-        Cylinder zAxis = new Cylinder(Constants.COORDINATE_AXIS_DIAMETER, axisLength);
         zAxis.setMaterial(new PhongMaterial(Color.BLUE));
         zAxis.setRotationAxis(Rotate.X_AXIS);
         zAxis.setRotate(Constants.COORDINATE_AXIS_Z_ROTATE);
 
         Group grid = createGrid(Constants.GRID_SIZE, Constants.GRID_STEP);
-
         axesGroup = new Group(xAxis, yAxis, zAxis, grid);
 
         return axesGroup;
@@ -535,6 +569,7 @@ public class InteractionController
         Color gridColor = Color.GRAY;
         double thickness = Constants.GRID_THICKNESS;
 
+        // Erstellen der Grid aus Boxen
         for (int i = -size; i <= size; i += step)
         {
             Box vLine = new Box(thickness, size * Constants.NUMBERS_TWO, thickness);
